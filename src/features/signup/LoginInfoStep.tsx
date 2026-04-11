@@ -33,10 +33,11 @@ import DynamicButton from '../drawer/button/DynamicButton';
 import ShowEye from '../drawer/HideShowImgBtn/ShowEye';
 import FlotingInput from '../drawer/securityPages/FlotingInput';
 import { RootState } from '../../reduxUtils/store';
-import { SvgUri } from 'react-native-svg';
 import { TouchableWithoutFeedback } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { translate } from '../../utils/languageUtils/I18n';
+import SmartIcon from '../../components/svgToPngUrl';
+
 const LoginInfoStep = () => {
 
 
@@ -370,7 +371,7 @@ return (
           inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
         />
         <View style={styles.IconStyle}>
-          <SvgUri height={hScale(48)} width={hScale(48)} uri={svg.MobileNumber} />
+          <SmartIcon height={hScale(48)} width={hScale(48)} uri={svg.MobileNumber} />
         </View>
       </View>
 
@@ -396,7 +397,7 @@ return (
           inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
         />
         <View style={styles.IconStyle}>
-          <SvgUri height={hScale(48)} width={hScale(48)} uri={svg.Email} />
+          <SmartIcon height={hScale(48)} width={hScale(48)} uri={svg.Email} />
         </View>
       </View>
 
@@ -412,7 +413,7 @@ return (
           inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
         />
         <View style={styles.IconStyle}>
-          <SvgUri height={hScale(48)} width={hScale(48)} uri={svg.personUser} />
+          <SmartIcon height={hScale(48)} width={hScale(48)} uri={svg.personUser} />
         </View>
       </View>
 
@@ -429,7 +430,7 @@ return (
           inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
         />
         <View style={styles.IconStyle}>
-          <SvgUri height={hScale(48)} width={hScale(48)} uri={svg.ReferralCode} />
+          <SmartIcon height={hScale(48)} width={hScale(48)} uri={svg.ReferralCode} />
         </View>
       </View>
 
@@ -446,7 +447,7 @@ return (
           inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
         />
         <View style={styles.IconStyle}>
-          <SvgUri height={hScale(48)} width={hScale(48)} uri={svg.Password} />
+          <SmartIcon height={hScale(48)} width={hScale(48)} uri={svg.Password} />
         </View>
       </View>
 
@@ -463,7 +464,7 @@ return (
           inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
         />
         <View style={styles.IconStyle}>
-          <SvgUri height={hScale(48)} width={hScale(48)} uri={svg.Password} />
+          <SmartIcon height={hScale(48)} width={hScale(48)} uri={svg.Password} />
         </View>
         {verifyPassword.length >= 5 && (
           <View style={styles.righticon}>

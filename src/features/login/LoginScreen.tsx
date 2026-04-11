@@ -66,6 +66,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import LanguageButton from '../../components/LanguageButton';
 import CheckSvg from '../drawer/svgimgcomponents/CheckSvg';
+import SmartIcon from '../../components/svgToPngUrl';
 
 const LoginScreen = () => {
   const { colorConfig, Loc_Data, deviceInfo, signUpId,signUpPassword} = useSelector((state: RootState) => state.userInfo);
@@ -655,7 +656,10 @@ const onPressLogin = useCallback(async (otp) => {
   {/* Username Input */}
   <View style={styles.inputWrapper}>
     <View style={styles.iconBox}>
-      <SvgUri height={hScale(22)} width={hScale(22)} uri={svg.personUser} />
+
+<SmartIcon uri={svg.personUser}/>
+
+      {/* <SvgUri height={hScale(22)} width={hScale(22)} uri={svg.personUser} /> */}
     </View>
     <TextInput
       style={styles.textInput}
@@ -671,7 +675,9 @@ const onPressLogin = useCallback(async (otp) => {
   {/* Password Input */}
   <View style={styles.inputWrapper}>
     <View style={styles.iconBox}>
-      <SvgUri height={hScale(22)} width={hScale(22)} uri={svg.Password} />
+
+      <SmartIcon uri={svg.Password}/>
+      {/* <SvgUri height={hScale(22)} width={hScale(22)} uri={svg.Password} /> */}
     </View>
     <TextInput
       style={styles.textInput}

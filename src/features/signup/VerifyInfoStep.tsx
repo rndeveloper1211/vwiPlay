@@ -27,6 +27,7 @@ import FlotingInput from '../drawer/securityPages/FlotingInput';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { setSignUpId, setSignUpPassword } from '../../reduxUtils/store/userInfoSlice';
 import ShowLoader from '../../components/ShowLoder';
+import SmartIcon from '../../components/svgToPngUrl';
 
 const VerifyInfoStep = () => {
 
@@ -229,13 +230,14 @@ const VerifyInfoStep = () => {
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
           />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            {/* <SvgUri
               height={hScale(48)}
               width={hScale(48)}
 
               uri={svg.MobileNumber}
-            />
-
+            /> */}
+<SmartIcon uri={svg.MobileNumber}  height={hScale(48)}
+              width={hScale(48)}/>
           </View>
         </View>
         <View style={styles.inputview}>
@@ -246,12 +248,14 @@ const VerifyInfoStep = () => {
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
           />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            {/* <SvgUri
               height={hScale(48)}
               width={hScale(48)}
 
               uri={svg.personUser}
-            />
+            /> */}
+<SmartIcon uri={svg.personUser}  height={hScale(48)}
+              width={hScale(48)}/>
 
           </View>
         </View>
@@ -262,13 +266,14 @@ const VerifyInfoStep = () => {
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
           />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            {/* <SvgUri
               height={hScale(48)}
               width={hScale(48)}
 
               uri={svg.Email}
-            />
-
+            /> */}
+<SmartIcon uri={svg.Email}  height={hScale(48)}
+              width={hScale(48)}/>
           </View>
         </View>
         <View style={styles.inputview}>
@@ -278,13 +283,14 @@ const VerifyInfoStep = () => {
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
           />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            {/* <SvgUri
               height={hScale(48)}
               width={hScale(48)}
 
               uri={svg.AadharCard}
-            />
-
+            /> */}
+<SmartIcon uri={svg.AadharCard}  height={hScale(48)}
+              width={hScale(48)}/>
           </View>
         </View>
         <View style={styles.inputview}>
@@ -294,12 +300,14 @@ const VerifyInfoStep = () => {
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
           />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            {/* <SvgUri
               height={hScale(48)}
               width={hScale(48)}
 
               uri={svg.PanCard}
-            />
+            /> */}
+<SmartIcon uri={svg.PanCard}  height={hScale(48)}
+              width={hScale(48)}/>
 
           </View>
         </View>
@@ -310,12 +318,14 @@ const VerifyInfoStep = () => {
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
           />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            {/* <SvgUri
               height={hScale(48)}
               width={hScale(48)}
 
               uri={svg.ReferralCode}
-            />
+            /> */}
+<SmartIcon uri={svg.ReferralCode}  height={hScale(48)}
+              width={hScale(48)}/>
 
           </View>
         </View>
@@ -326,13 +336,16 @@ const VerifyInfoStep = () => {
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
           />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            {/* <SvgUri
               height={hScale(48)}
               width={hScale(48)}
 
               uri={svg.Calendar}
-            />
-
+            /> */}
+<SmartIcon 
+height={hScale(48)}
+              width={hScale(48)}
+uri={svg.Calendar}/>
           </View>
         </View>
         <View style={styles.inputview}>
@@ -342,13 +355,16 @@ const VerifyInfoStep = () => {
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
           />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            {/* <SvgUri
               height={hScale(48)}
               width={hScale(48)}
 
               uri={svg.State}
-            />
-
+            /> */}
+<SmartIcon 
+height={hScale(48)}
+              width={hScale(48)}
+uri={svg.State}/>
           </View>
         </View>
         <View style={styles.inputview}>
@@ -358,13 +374,14 @@ const VerifyInfoStep = () => {
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
           />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            {/* <SvgUri
               height={hScale(48)}
               width={hScale(48)}
 
               uri={svg.PinCodeLocation}
-            />
-
+            /> */}
+<SmartIcon uri={svg.PinCodeLocation}  height={hScale(48)}
+              width={hScale(48)}/>
           </View>
         </View>
         <View style={styles.inputview}>
@@ -374,12 +391,14 @@ const VerifyInfoStep = () => {
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
           />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            {/* <SvgUri
               height={hScale(48)}
               width={hScale(48)}
 
               uri={svg.District}
-            />
+            /> */}
+            <SmartIcon uri={svg.District}  height={hScale(48)}
+              width={hScale(48)}/>
 
           </View>
         </View>
@@ -391,12 +410,16 @@ const VerifyInfoStep = () => {
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
           />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            {/* <SvgUri
               height={hScale(48)}
               width={hScale(48)}
 
               uri={svg.BussinessName}
-            />
+            /> */}
+<SmartIcon uri={svg.BussinessName}
+   height={hScale(48)}
+              width={hScale(48)}
+/>
 
           </View>
         </View>
@@ -408,7 +431,7 @@ const VerifyInfoStep = () => {
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]}
           />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            <SmartIcon
               height={hScale(48)}
               width={hScale(48)}
 
@@ -427,7 +450,7 @@ const VerifyInfoStep = () => {
           />
 
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            <SmartIcon
               height={hScale(48)}
               width={hScale(48)}
 

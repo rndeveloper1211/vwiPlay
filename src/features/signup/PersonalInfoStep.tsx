@@ -21,7 +21,6 @@ import { colors } from '../../utils/styles/theme';
 import { hScale, SCREEN_HEIGHT, wScale } from '../../utils/styles/dimensions';
 import BackArrow from '../../utils/svgUtils/BackArrow';
 import { SignUpContext } from './SignUpContext';
-import { SvgUri, SvgXml } from 'react-native-svg';
 import DropdownSvg from '../../utils/svgUtils/DropdownSvg';
 import { FlashList } from '@shopify/flash-list';
 import { stateData } from '../../utils/stateData';
@@ -33,6 +32,7 @@ import FlotingInput from '../drawer/securityPages/FlotingInput';
 import OnelineDropdownSvg from '../drawer/svgimgcomponents/simpledropdown';
 import ClosseModalSvg2 from '../drawer/svgimgcomponents/ClosseModal2';
 import Calendarsvg from '../drawer/svgimgcomponents/Calendarsvg';
+import SmartIcon from '../../components/svgToPngUrl';
 
 const PersonalInfoStep = () => {
   const { colorConfig } = useSelector((state: RootState) => state.userInfo);
@@ -127,7 +127,7 @@ const PersonalInfoStep = () => {
           labelinputstyle={styles.labelinputstyle}
           inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]} />
         <TouchableOpacity style={styles.IconStyle}>
-          <SvgUri
+          <SmartIcon
             height={hScale(48)}
             width={hScale(48)}
             uri={svg.Calendar}
@@ -149,7 +149,7 @@ const PersonalInfoStep = () => {
           inputstyle={[styles.inputstyle, { borderRadius: Radius2, }]}
         />
         <View style={[styles.IconStyle, {}]}>
-          <SvgUri
+          <SmartIcon
             height={hScale(48)}
             width={hScale(48)}
             uri={svg.PinCodeLocation}
@@ -170,7 +170,7 @@ const PersonalInfoStep = () => {
           <OnelineDropdownSvg />
         </View> : null}
         <View style={[styles.IconStyle, {}]}>
-          <SvgUri
+          <SmartIcon
             height={hScale(48)}
             width={hScale(48)}
             uri={svg.PinCodeLocation}
@@ -204,7 +204,7 @@ const PersonalInfoStep = () => {
         </View>
           : ''}
         <View style={[styles.IconStyle, {}]}>
-          <SvgUri
+          <SmartIcon
             height={hScale(48)}
             width={hScale(48)}
             uri={svg.PinCodeLocation}

@@ -17,11 +17,11 @@ import { useNavigation } from "@react-navigation/native";
 import OnelineDropdownSvg from "../../drawer/svgimgcomponents/simpledropdown";
 import { appendLog } from "../../../components/log_file_Saver";
 import ImagePreviewModal from "../Radiantregister/ImagePreviewModal";
-import { SvgUri } from "react-native-svg";
 import { useDocumentUpload } from "../../../hooks/useDocumentUpload";
 import ConfirmBox from "../../../components/ConfirmBox";
 import WalletCard from "../RadiantTrxn/WalletCard";
 import Rechargeconfirm from "../../../components/Rechargeconfirm";
+import SmartIcon from "../../../components/svgToPngUrl";
 const Totalpayreport = ({ route }) => {
     const { colorConfig } = useSelector((state: RootState) => state.userInfo);
     const { selectedAmount = '', requestid = '', PaymentMode = '', Individualrequestid = '', ceId = '', paymentType = '' } = route?.params || {};
@@ -517,7 +517,7 @@ const Totalpayreport = ({ route }) => {
                             >
 
                                 <View style={{ width: wScale(70), height: 60 }}>
-                                    <SvgUri width={'100%'} height={'100%'} uri={item.logoimg}
+                                    <SmartIcon width={'100%'} height={'100%'} uri={item.logoimg}
                                     />
 
                                 </View>

@@ -21,7 +21,7 @@ const useAxiosHook = () => {
   const axiosInstance = useMemo(
     () =>
       axios.create({
-        baseURL: 'http://native.maxuspay.com/',
+        baseURL: 'http://native.vastwebindia.com/',
         //  baseURL: 'http://native.skeshari.in/',
       }),
     [],

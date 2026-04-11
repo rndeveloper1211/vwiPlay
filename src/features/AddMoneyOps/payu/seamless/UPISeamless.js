@@ -1,10 +1,9 @@
 import { translate } from "../../../../utils/languageUtils/I18n";
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Button, Alert, TouchableOpacity, NativeModules } from 'react-native';
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import {initiatePayment as initPayment} from './PaymentOptions'
 import { getHash, CBParams} from '../utils';
 import PayUSdk from 'payu-core-pg-react';
-import { RootState } from '../../../reduxUtils/store';
 
 const UPISeamless = (route,props) => {
   const { navigation } = route

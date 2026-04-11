@@ -13,8 +13,8 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import DynamicButton from '../drawer/button/DynamicButton';
 import ImageBottomSheet from '../../components/ImageBottomSheet';
 import FlotingInput from '../drawer/securityPages/FlotingInput';
-import { SvgUri } from 'react-native-svg';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import SmartIcon from '../../components/svgToPngUrl';
 
 const SignUpKyc = () => {
   const {
@@ -145,7 +145,7 @@ const showToast = (msg) => {
             labelinputstyle={{ left: wScale(68) }}
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]} />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            <SmartIcon
               height={hScale(48)}
               width={hScale(48)}
 
@@ -164,7 +164,7 @@ const showToast = (msg) => {
             labelinputstyle={{ left: wScale(68) }}
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]} />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            <SmartIcon
               height={hScale(48)}
               width={hScale(48)}
 
@@ -184,7 +184,7 @@ const showToast = (msg) => {
             labelinputstyle={{ left: wScale(68) }}
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]} />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            <SmartIcon
               height={hScale(48)}
               width={hScale(48)}
 
@@ -204,7 +204,7 @@ const showToast = (msg) => {
             labelinputstyle={{ left: wScale(68) }}
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]} />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            <SmartIcon
               height={hScale(48)}
               width={hScale(48)}
 
@@ -224,7 +224,7 @@ const showToast = (msg) => {
             labelinputstyle={{ left: wScale(68) }}
             inputstyle={[styles.inputstyle, { borderRadius: Radius2 }]} />
           <View style={[styles.IconStyle, {}]}>
-            <SvgUri
+            <SmartIcon
               height={hScale(48)}
               width={hScale(48)}
 

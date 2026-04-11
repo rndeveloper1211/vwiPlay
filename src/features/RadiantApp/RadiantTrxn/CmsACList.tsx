@@ -20,13 +20,13 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { APP_URLS } from '../../../utils/network/urls';
 import useAxiosHook from '../../../utils/network/AxiosClient';
-import { SvgUri } from 'react-native-svg';
 import ShowLoader from '../../../components/ShowLoder';
 import NoDatafound from '../../drawer/svgimgcomponents/Nodatafound';
 import TabBar from '../../Recharge/TabView/TabBarView';
 import ViewShot, { captureRef } from 'react-native-view-shot';
 import Share from "react-native-share";
 import LottieView from 'lottie-react-native';
+import SmartIcon from "../../../components/svgToPngUrl";
 
 const CmsACList = () => {
     const { colorConfig } = useSelector((state: RootState) => state.userInfo);
@@ -111,7 +111,7 @@ const CmsACList = () => {
             <View style={[{ backgroundColor: `${colorConfig.secondaryColor}1A` }]}>
                 <View style={[styles.logoview, { backgroundColor: `${colorConfig.secondaryColor}33` }]}>
                     <View style={{ width: wScale(115), aspectRatio: 115 / 46, backgroundColor: 'rgba(255,255,255,0.5)', }}>
-                        <SvgUri width={'100%'} height={'100%'} uri={item.logoimg}
+                        <SmartIcon width={'100%'} height={'100%'} uri={item.logoimg}
                             preserveAspectRatio=""
                         />
 
@@ -158,7 +158,7 @@ const CmsACList = () => {
             <View style={[{ backgroundColor: '#fff' }]}>
                 <View style={[styles.logoview, { backgroundColor: `${colorConfig.secondaryColor}33` }]}>
                     <View style={{ width: wScale(115), aspectRatio: 115 / 46, backgroundColor: 'rgba(255,255,255,0.5)' }}>
-                        <SvgUri width={'100%'} height={'100%'} uri={item.logoimg} />
+                        <SmartIcon width={'100%'} height={'100%'} uri={item.logoimg} />
                     </View>
 
                     <TouchableOpacity style={styles.shareview} onPress={onShare}>

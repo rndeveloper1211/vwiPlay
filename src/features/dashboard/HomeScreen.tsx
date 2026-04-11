@@ -1,29 +1,29 @@
-import { translate } from "../../utils/languageUtils/I18n";
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import { translate } from '../../utils/languageUtils/I18n';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert, Pressable, RefreshControl, ScrollView,
   StatusBar, TouchableOpacity, Animated,
   View, Text, StyleSheet, Image,
-} from "react-native";
-import LinearGradient from "react-native-linear-gradient";
-import IconButtons from "./components/IconButtons";
-import CarouselView from "./components/CarouselView";
-import { hScale, wScale } from "../../utils/styles/dimensions";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../reduxUtils/store";
-import useAxiosHook from "../../utils/network/AxiosClient";
-import { APP_URLS } from "../../utils/network/urls";
-import { sectionData } from "./utils";
-import DashboardHeader from "./components/DashboardHeader";
-import { useNavigation } from "../../utils/navigation/NavigationService";
-import LottieView from "lottie-react-native";
-import { decryptData } from "../../utils/encryptionUtils";
-import { reset, setDashboardData, setIsDemoUser, setThemeChangeTime } from "../../reduxUtils/store/userInfoSlice";
-import HoldcreditSvg from "../drawer/svgimgcomponents/HoldcreditSvg";
-import ToselfSvg from "../drawer/svgimgcomponents/ToselfSvg";
-import RecentTrSvg from "../drawer/svgimgcomponents/RecentTrSvg";
-import NewsSlider from "../../components/SliderText";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import IconButtons from './components/IconButtons';
+import CarouselView from './components/CarouselView';
+import { hScale, wScale } from '../../utils/styles/dimensions';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../reduxUtils/store';
+import useAxiosHook from '../../utils/network/AxiosClient';
+import { APP_URLS } from '../../utils/network/urls';
+import { sectionData } from './utils';
+import DashboardHeader from './components/DashboardHeader';
+import { useNavigation } from '../../utils/navigation/NavigationService';
+import LottieView from 'lottie-react-native';
+import { decryptData } from '../../utils/encryptionUtils';
+import { reset, setDashboardData, setIsDemoUser, setThemeChangeTime } from '../../reduxUtils/store/userInfoSlice';
+import HoldcreditSvg from '../drawer/svgimgcomponents/HoldcreditSvg';
+import ToselfSvg from '../drawer/svgimgcomponents/ToselfSvg';
+import RecentTrSvg from '../drawer/svgimgcomponents/RecentTrSvg';
+import NewsSlider from '../../components/SliderText';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import QrcodSvg from '../drawer/svgimgcomponents/QrcodSvg';
 
 // ─── Glow Orbs (same as ReportScreen / AccReportScreen) ──────────────────────
@@ -39,11 +39,11 @@ const GlowOrbs = ({ primaryColor }: { primaryColor: string }) => (
     }]} />
     <View style={[styles.orb, {
       top: 500, left: 20, width: 180, height: 180,
-      backgroundColor: "rgba(5,150,105,0.15)",
+      backgroundColor: 'rgba(5,150,105,0.15)',
     }]} />
     <View style={[styles.orb, {
       bottom: 100, right: 10, width: 200, height: 200,
-      backgroundColor: "rgba(219,39,119,0.14)",
+      backgroundColor: 'rgba(219,39,119,0.14)',
     }]} />
   </View>
 );
@@ -59,14 +59,14 @@ const GlassSection = ({ title, rightElement, children }: GlassSectionProps) => (
   <View style={styles.glassSection}>
     {/* Glass fill */}
     <LinearGradient
-      colors={["rgba(13, 8, 8, 0.13)", "rgba(255,255,255,0.04)"]}
+      colors={['rgba(13, 8, 8, 0.13)', 'rgba(255,255,255,0.04)']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={StyleSheet.absoluteFillObject}
     />
     {/* Top shimmer */}
     <LinearGradient
-      colors={["rgba(255,255,255,0.45)", "rgba(255,255,255,0)"]}
+      colors={['rgba(255,255,255,0.45)', 'rgba(255,255,255,0)']}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
       style={styles.sectionTopShimmer}
@@ -92,13 +92,13 @@ interface QuickBtnProps {
 const QuickBtn = ({ icon, label, onPress, primaryColor }: QuickBtnProps) => (
   <TouchableOpacity activeOpacity={0.72} onPress={onPress} style={styles.quickBtnOuter}>
     <LinearGradient
-      colors={["rgba(255,255,255,0.22)", "rgba(255,255,255,0.06)"]}
+      colors={['rgba(255,255,255,0.22)', 'rgba(255,255,255,0.06)']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={StyleSheet.absoluteFillObject}
     />
     <LinearGradient
-      colors={["rgba(255,255,255,0.5)", "rgba(255,255,255,0)"]}
+      colors={['rgba(255,255,255,0.5)', 'rgba(255,255,255,0)']}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
       style={styles.quickBtnShimmer}
@@ -162,13 +162,13 @@ const HomeScreen = () => {
       setRefreshing(true);
       Newssms();
 
-      const storedItems = await AsyncStorage.getItem("quickAccessItems");
-      const userData    = await AsyncStorage.getItem("expiryDate");
+      const storedItems = await AsyncStorage.getItem('quickAccessItems');
+      const userData    = await AsyncStorage.getItem('expiryDate');
       const date        = new Date();
 
       if (userData === date.toUTCString()) {
-        Alert.alert("Session Expired", userData,
-          [{ text: "OK", onPress: () => dispatch(reset()) }],
+        Alert.alert('Session Expired', userData,
+          [{ text: 'OK', onPress: () => dispatch(reset()) }],
           { cancelable: false });
         setRefreshing(false);
         return;
@@ -184,9 +184,9 @@ const HomeScreen = () => {
         setOtherSectionData(dashboardData.otherSectionData   || []);
         setTravelSectionData(dashboardData.travelSectionData  || []);
         setCmsSectionData(dashboardData.cmsSectionData        || []);
-        const filtered = dashboardData.rechargeSectionData?.filter(i => i.name !== "Hide More") || [];
+        const filtered = dashboardData.rechargeSectionData?.filter(i => i.name !== 'Hide More') || [];
         const first7   = filtered.slice(0, 7);
-        const vmItem   = filtered.find(i => i.name === "View More");
+        const vmItem   = filtered.find(i => i.name === 'View More');
         setRechargeSectionData(vmItem ? [...first7, vmItem] : first7);
         setRechargeViewMoreData(filtered);
         setRefreshing(false);
@@ -201,9 +201,9 @@ const HomeScreen = () => {
         post({ url: APP_URLS.getcmsSectionImages }),
       ]);
 
-      const filtered = rRes?.filter((i: any) => i.name !== "Hide More1") || [];
+      const filtered = rRes?.filter((i: any) => i.name !== 'Hide More1') || [];
       const first7   = filtered.slice(0, 7);
-      const vmItem   = filtered.find((i: any) => i.name === "View More");
+      const vmItem   = filtered.find((i: any) => i.name === 'View More');
       setRechargeSectionData(vmItem ? [...first7, vmItem] : first7);
       setRechargeViewMoreData(filtered);
       setFinanceSectionData(fRes || []);
@@ -216,7 +216,7 @@ const HomeScreen = () => {
       dispatch(setThemeChangeTime({ themeUpdateTime: backendTime }));
       setRefreshing(false);
     } catch (e) {
-      console.error("Fetch Data Error:", e);
+      console.error('Fetch Data Error:', e);
       setRefreshing(false);
     }
   };
@@ -234,7 +234,7 @@ const HomeScreen = () => {
       const data     = userInfo.data;
       setFirmDet(decryptData(data.vvvv, data.kkkk, data.frmanems));
       setAdminFirmDet(decryptData(data.vvvv, data.kkkk, data.adminfarmname));
-      await AsyncStorage.setItem("adminFarmData", JSON.stringify({
+      await AsyncStorage.setItem('adminFarmData', JSON.stringify({
         adminFarmName: decryptData(data.vvvv, data.kkkk, data.adminfarmname),
         frmanems:      decryptData(data.vvvv, data.kkkk, data.frmanems),
         photoss:       decryptData(data.vvvv, data.kkkk, data.photoss),
@@ -252,16 +252,16 @@ const HomeScreen = () => {
       const APstatus = await get({ url: `${APP_URLS.AddharPanStatus}=${userId}` });
       if (!APstatus) return;
       let isVerify = true;
-      if      (APstatus.verify_type === "all")    isVerify = APstatus.aadhar_status && APstatus.pan_status;
-      else if (APstatus.verify_type === "aadhar") isVerify = APstatus.aadhar_status === true;
-      else if (APstatus.verify_type === "pan")    isVerify = APstatus.pan_status    === true;
+      if      (APstatus.verify_type === 'all')    isVerify = APstatus.aadhar_status && APstatus.pan_status;
+      else if (APstatus.verify_type === 'aadhar') isVerify = APstatus.aadhar_status === true;
+      else if (APstatus.verify_type === 'pan')    isVerify = APstatus.pan_status    === true;
       if (!isVerify) {
-        navigation.replace("AadhrPanVerify", {
+        navigation.replace('AadhrPanVerify', {
           aadharcard: APstatus.aadhar, pancard: APstatus.pan, verify_type: APstatus.verify_type,
         });
       }
     } catch (e) {
-      console.error("Error in adharpanStatus:", e);
+      console.error('Error in adharpanStatus:', e);
     }
   };
 
@@ -284,7 +284,7 @@ const HomeScreen = () => {
       <DashboardHeader refreshPress={onRefresh} />
 
       {/* News ticker (non-Divyanshi) */}
-      {APP_URLS.AppName !== "Divyanshi Pay" && newsData?.length > 0 && (
+      {APP_URLS.AppName !== 'Divyanshi Pay' && newsData?.length > 0 && (
         <NewsSlider data={newsData} />
       )}
 
@@ -304,62 +304,62 @@ const HomeScreen = () => {
         <View style={styles.quickRow}>
            <QuickBtn
                     icon={<QrcodSvg size={18} color="#fff" />}
-                    label={translate("Scan & Pay")}
-                    onPress={() => navigation.navigate({ name: "QRScanScreen" })}
+                    label={translate('Scan & Pay')}
+                    onPress={() => navigation.navigate({ name: 'QRScanScreen' })}
                     primaryColor={colorConfig.primaryColor}
                   />
 
           <QuickBtn
             icon={<ToselfSvg size={18} color="#fff" />}
-            label={translate("Move_Wallet")}
-            onPress={() => navigation.navigate({ name: "PostoMain" })}
+            label={translate('Move_Wallet')}
+            onPress={() => navigation.navigate({ name: 'PostoMain' })}
             primaryColor={colorConfig.primaryColor}
           />
           <QuickBtn
             icon={<HoldcreditSvg size={18} color="#fff" />}
-            label={translate("Hold_Credit")}
-            onPress={() => navigation.navigate({ name: "HoldAndCredit" })}
+            label={translate('Hold_Credit')}
+            onPress={() => navigation.navigate({ name: 'HoldAndCredit' })}
             primaryColor={colorConfig.primaryColor}
           />
           
           <QuickBtn
             icon={<RecentTrSvg size={18} color="#fff" />}
-            label={translate("Recent_Tr")}
-            onPress={() => navigation.navigate("RecentTx")}
+            label={translate('Recent_Tr')}
+            onPress={() => navigation.navigate('RecentTx')}
             primaryColor={colorConfig.primaryColor}
           />
         </View>
 
         {/* ── Quick Access ── */}
-        {APP_URLS.AppName !== "Divyanshi Pay" && (
+        {APP_URLS.AppName !== 'Divyanshi Pay' && (
           <View style={styles.glassSection}>
             <LinearGradient
-              colors={["rgba(255,255,255,0.13)", "rgba(255,255,255,0.04)"]}
+              colors={['rgba(255,255,255,0.13)', 'rgba(255,255,255,0.04)']}
               start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
               style={StyleSheet.absoluteFillObject}
             />
             <LinearGradient
-              colors={["rgba(255,255,255,0.45)", "rgba(255,255,255,0)"]}
+              colors={['rgba(255,255,255,0.45)', 'rgba(255,255,255,0)']}
               start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
               style={styles.sectionTopShimmer}
             />
 
             <View style={styles.quickAccessHeader}>
               <View style={styles.qaLeft}>
-                <Text style={styles.qaHi}>{translate("Hi")}</Text>
+                <Text style={styles.qaHi}>{translate('Hi')}</Text>
                 <Text style={styles.qaName} numberOfLines={1} ellipsizeMode="tail">
                   {FirmDet}
                 </Text>
-                <Text style={styles.qaHi}>{translate("Your_Quick_Access")}</Text>
+                <Text style={styles.qaHi}>{translate('Your_Quick_Access')}</Text>
               </View>
               <Pressable
-                onPress={() => navigation.navigate({ name: "QuickAccessScreen" })}
+                onPress={() => navigation.navigate({ name: 'QuickAccessScreen' })}
                 style={[styles.editBtn, { backgroundColor: `${colorConfig.primaryColor}90` }]}
               >
                 <LottieView
                   autoPlay loop
                   style={styles.lotiSmall}
-                  source={require("../../utils/lottieIcons/pencil.json")}
+                  source={require('../../utils/lottieIcons/pencil.json')}
                 />
               </Pressable>
             </View>
@@ -378,16 +378,16 @@ const HomeScreen = () => {
         </View>
 
         {/* News ticker (Divyanshi only) */}
-        {APP_URLS.AppName === "Divyanshi Pay" && newsData?.length > 0 && (
+        {APP_URLS.AppName === 'Divyanshi Pay' && newsData?.length > 0 && (
           <NewsSlider data={newsData} />
         )}
 
         {/* ── Recharge & Pay Bills ── */}
         <GlassSection
-          title={translate("Recharge_Pay_Bill")}
+          title={translate('Recharge_Pay_Bill')}
           rightElement={
             <Image
-              source={require("../../features/drawer/assets/bblogo.png")}
+              source={require('../../features/drawer/assets/bblogo.png')}
               style={styles.bblogo}
             />
           }
@@ -396,7 +396,7 @@ const HomeScreen = () => {
             buttonData={viewMoreStatus ? rechargeViewMoreData : rechargeSectionData}
             showViewMoreButton
             setViewMoreStatus={setViewMoreStatus}
-            buttonTitle={viewMoreStatus ? "Hide More" : "View More"}
+            buttonTitle={viewMoreStatus ? 'Hide More' : 'View More'}
             getItem={undefined}
             isQuickAccess={undefined}
             iconButtonstyle={undefined}
@@ -406,10 +406,10 @@ const HomeScreen = () => {
         {/* ── CMS ── */}
         {!is_demo && (
           <GlassSection
-            title={translate("Our_Exclusive_CMS")}
+            title={translate('Our_Exclusive_CMS')}
             rightElement={
               <Image
-                source={require("../../../assets/images/radiant.png")}
+                source={require('../../../assets/images/radiant.png')}
                 style={styles.cmsLogo}
               />
             }
@@ -425,12 +425,12 @@ const HomeScreen = () => {
 
         {/* ── Financial Services ── */}
         <GlassSection
-          title={translate("Financial_Services")}
+          title={translate('Financial_Services')}
           rightElement={
             <LottieView
               autoPlay loop
               style={styles.lotiRight}
-              source={require("../../utils/lottieIcons/Money-bag2")}
+              source={require('../../utils/lottieIcons/Money-bag2')}
             />
           }
         >
@@ -450,14 +450,14 @@ const HomeScreen = () => {
         </GlassSection>
 
         {/* ── Travel ── */}
-        {!is_demo && APP_URLS.AppName !== "Divyanshi Pay" && (
+        {!is_demo && APP_URLS.AppName !== 'Divyanshi Pay' && (
           <GlassSection
-            title={translate("Travel_Hotel")}
+            title={translate('Travel_Hotel')}
             rightElement={
               <LottieView
                 autoPlay loop
                 style={styles.lotiRight}
-                source={require("../../utils/lottieIcons/Travel.json")}
+                source={require('../../utils/lottieIcons/Travel.json')}
               />
             }
           >
@@ -466,8 +466,8 @@ const HomeScreen = () => {
         )}
 
         {/* ── Other Section ── */}
-        {!is_demo && APP_URLS.AppName !== "Divyanshi Pay" && (
-          <GlassSection title={translate("Other_Section")}>
+        {!is_demo && APP_URLS.AppName !== 'Divyanshi Pay' && (
+          <GlassSection title={translate('Other_Section')}>
             <IconButtons buttonData={otherSectionData} />
           </GlassSection>
         )}
@@ -480,7 +480,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   root: { flex: 1 ,paddingBottom:hScale(30) },
 
-  orb: { position: "absolute", borderRadius: 999 },
+  orb: { position: 'absolute', borderRadius: 999 },
 
   scrollContent: {
     paddingHorizontal: wScale(10),
@@ -490,23 +490,23 @@ const styles = StyleSheet.create({
 
   // ── Quick action row ──
   quickRow: {
-    flexDirection:  "row",
-    justifyContent: "space-between",
+    flexDirection:  'row',
+    justifyContent: 'space-between',
     marginBottom:   hScale(10),
     gap:            wScale(6),
   },
   quickBtnOuter: {
     flex:           1,
-    overflow:       "hidden",
+    overflow:       'hidden',
     borderRadius:   14,
     borderWidth:    1,
-    borderColor:    "rgba(255,255,255,0.22)",
-    alignItems:     "center",
+    borderColor:    'rgba(255,255,255,0.22)',
+    alignItems:     'center',
     paddingVertical: hScale(10),
     paddingHorizontal: wScale(4),
   },
   quickBtnShimmer: {
-    position: "absolute",
+    position: 'absolute',
     top: 0, left: 0, right: 0,
     height: hScale(30),
     borderTopLeftRadius: 14,
@@ -516,18 +516,18 @@ const styles = StyleSheet.create({
     height:        hScale(34),
     width:         hScale(34),
     borderRadius:  10,
-    justifyContent:"center",
-    alignItems:    "center",
+    justifyContent:'center',
+    alignItems:    'center',
     marginBottom:  hScale(5),
     borderWidth:   1,
-    borderColor:   "rgba(255,255,255,0.2)",
+    borderColor:   'rgba(255,255,255,0.2)',
   },
   quickBtnText: {
-    color:      "rgba(255,255,255,0.9)",
+    color:      'rgba(255,255,255,0.9)',
     fontSize:   wScale(11),
-    fontWeight: "600",
-    textAlign:  "center",
-    textShadowColor:  "rgba(0,0,0,0.4)",
+    fontWeight: '600',
+    textAlign:  'center',
+    textShadowColor:  'rgba(0,0,0,0.4)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3,
   },
@@ -535,32 +535,32 @@ const styles = StyleSheet.create({
   // ── Glass section card ──
   glassSection: {
     borderRadius:   18,
-    overflow:       "hidden",
+    overflow:       'hidden',
     borderWidth:    1,
-    borderColor:    "rgba(255,255,255,0.18)",
+    borderColor:    'rgba(255,255,255,0.18)',
     marginVertical: hScale(6),
-    position:       "relative",
+    position:       'relative',
   },
   sectionTopShimmer: {
-    position:              "absolute",
+    position:              'absolute',
     top: 0, left: 0, right: 0,
     height:                hScale(32),
     borderTopLeftRadius:   18,
     borderTopRightRadius:  18,
   },
   sectionTitleRow: {
-    flexDirection:  "row",
-    justifyContent: "space-between",
-    alignItems:     "center",
+    flexDirection:  'row',
+    justifyContent: 'space-between',
+    alignItems:     'center',
     paddingTop:     hScale(12),
     paddingHorizontal: wScale(14),
     paddingRight:   wScale(12),
   },
   sectionTitle: {
     fontSize:   wScale(15),
-    color:      "rgba(255,255,255,0.95)",
-    fontWeight: "700",
-    textShadowColor:  "rgba(0,0,0,0.4)",
+    color:      'rgba(255,255,255,0.95)',
+    fontWeight: '700',
+    textShadowColor:  'rgba(0,0,0,0.4)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
     letterSpacing:    0.3,
@@ -571,29 +571,29 @@ const styles = StyleSheet.create({
 
   // ── Quick Access card ──
   quickAccessHeader: {
-    flexDirection:  "row",
-    justifyContent: "space-between",
-    alignItems:     "center",
+    flexDirection:  'row',
+    justifyContent: 'space-between',
+    alignItems:     'center',
     paddingHorizontal: wScale(14),
     paddingTop:     hScale(10),
     paddingBottom:  hScale(4),
-    backgroundColor: "rgba(255,255,255,0.05)",
+    backgroundColor: 'rgba(255,255,255,0.05)',
   },
   qaLeft: {
-    flexDirection: "row",
-    alignItems:    "center",
-    flexWrap:      "wrap",
+    flexDirection: 'row',
+    alignItems:    'center',
+    flexWrap:      'wrap',
     flex:          1,
   },
   qaHi: {
     fontSize:   wScale(13),
-    color:      "rgba(255,255,255,0.85)",
+    color:      'rgba(255,255,255,0.85)',
     marginRight: wScale(4),
   },
   qaName: {
     fontSize:   wScale(13),
-    color:      "#fff",
-    fontWeight: "bold",
+    color:      '#fff',
+    fontWeight: 'bold',
     maxWidth:   wScale(130),
     marginRight: wScale(4),
   },
@@ -601,10 +601,10 @@ const styles = StyleSheet.create({
     height:        wScale(28),
     width:         wScale(28),
     borderRadius:  14,
-    justifyContent:"center",
-    alignItems:    "center",
+    justifyContent:'center',
+    alignItems:    'center',
     borderWidth:   1,
-    borderColor:   "rgba(255,255,255,0.25)",
+    borderColor:   'rgba(255,255,255,0.25)',
   },
   lotiSmall: { height: hScale(18), width: wScale(18) },
 
@@ -621,18 +621,18 @@ const styles = StyleSheet.create({
 
   // ── New badge ──
   newBadge: {
-    backgroundColor:   "red",
-    position:          "absolute",
+    backgroundColor:   'red',
+    position:          'absolute',
     right:             wScale(31),
     top:               hScale(10),
     zIndex:            20,
-    color:             "#fff",
-    textAlign:         "center",
+    color:             '#fff',
+    textAlign:         'center',
     fontSize:          wScale(12),
     borderRadius:      3,
     paddingHorizontal: wScale(4),
     paddingVertical:   hScale(1),
-    overflow:          "hidden",
+    overflow:          'hidden',
   },
 });
 
