@@ -1,7 +1,7 @@
 name: Android Build
 on:
   push:
-    branches: [ cicd ] # Jab aap code push karenge tab ye chalega
+    branches: [ main ]
 
 jobs:
   build:
@@ -10,7 +10,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Java
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
@@ -33,10 +33,14 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease
+          # Gradle ko memory limit exceed karne se bachane ke liye environment variables
+          ./gradlew assembleRelease \
+            -PMAVEN_USERNAME=${{ secrets.MAVEN_USERNAME }} \
+            -PMAVEN_PASSWORD=${{ secrets.MAVEN_PASSWORD }} \
+            --no-daemon
 
-      - name: Upload Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-apk
+          name: vwi-play-apk
           path: android/app/build/outputs/apk/release/app-release.apk
