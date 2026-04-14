@@ -1,0 +1,116 @@
+# ─────────────────────────────────────────
+# 🔥 NODE / REACT NATIVE
+# ─────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+
+# ─────────────────────────────────────────
+# 🔥 ANDROID
+# ─────────────────────────────────────────
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.cxx/
+*.keystore
+!debug.keystore
+
+# ─────────────────────────────────────────
+# 🔥 IOS
+# ─────────────────────────────────────────
+ios/build/
+ios/Pods/
+ios/DerivedData/
+*.xcuserstate
+*.xcworkspace
+
+# ─────────────────────────────────────────
+# 🔥 BUILD OUTPUT / RELEASE FILES
+# ─────────────────────────────────────────
+*.apk
+*.aab
+*.ipa
+*.apks
+dist/
+build/
+release/
+
+# ─────────────────────────────────────────
+# 🔥 OTA / BUNDLE FILES
+# ─────────────────────────────────────────
+*.jsbundle
+*.bundle
+*.map
+
+# ─────────────────────────────────────────
+# 🔥 MEDIA FILES (VERY IMPORTANT FOR YOU)
+# ─────────────────────────────────────────
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.zip
+*.rar
+*.7z
+
+# optional (agar CDN use kar rahe ho)
+assets/videos/
+assets/raw/
+assets/tmp/
+
+# ─────────────────────────────────────────
+# 🔥 IMAGES (OPTIONAL CDN MODE)
+# ─────────────────────────────────────────
+# agar tum CDN use karte ho to enable karo:
+# assets/images/
+
+# ─────────────────────────────────────────
+# 🔥 LOGS / CACHE
+# ─────────────────────────────────────────
+*.log
+*.tmp
+*.cache
+.cache/
+.tmp/
+.temp/
+
+# ─────────────────────────────────────────
+# 🔥 METRO / REACT CACHE
+# ─────────────────────────────────────────
+.metro-cache/
+.metro-health-check*
+
+# ─────────────────────────────────────────
+# 🔥 ENV FILES (SECURITY)
+# ─────────────────────────────────────────
+.env
+.env.*
+*.env
+
+# ─────────────────────────────────────────
+# 🔥 EDITOR / IDE
+# ─────────────────────────────────────────
+.vscode/
+.idea/
+*.iml
+
+# ─────────────────────────────────────────
+# 🔥 OS FILES
+# ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─────────────────────────────────────────
+# 🔥 TESTING
+# ─────────────────────────────────────────
+coverage/
+
+# ─────────────────────────────────────────
+# 🔥 MISC
+# ─────────────────────────────────────────
+*.swp
+*.swo
