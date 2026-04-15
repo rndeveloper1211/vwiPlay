@@ -198,7 +198,7 @@ function App() {
   const [currentStep, setCurrentStep] = useState<Step>('idle');
 
   useEffect(() => {
-    checkUpdate(setCurrentStep);
+ //   checkUpdate(setCurrentStep);
 
     if (__DEV__) {
       const isFabric = global?.nativeFabricUIManager != null;

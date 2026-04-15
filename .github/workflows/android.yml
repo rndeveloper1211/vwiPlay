@@ -1,0 +1,92 @@
+name: Android CI
+
+on:
+  push:
+    branches:
+      - main
+      - ota
+
+jobs:
+
+  # 🔥 OTA JOB (sirf ota branch ke liye)
+  ota:
+    if: github.ref == 'refs/heads/ota'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: corepack enable
+
+      - run: yarn install
+
+      # ✅ Bundle build
+      - name: Build OTA Bundle
+        run: |
+          npx react-native bundle \
+          --platform android \
+          --dev false \
+          --entry-file index.js \
+          --bundle-output dist/index.android.bundle \
+          --assets-dest dist
+
+      # ✅ ZIP create
+      - name: Zip OTA
+        run: |
+          cd dist
+          zip -r ota.zip .
+
+      # ✅ Push to repo (CDN use ke liye)
+      - name: Commit OTA
+        run: |
+          git config --global user.name "ci"
+          git config --global user.email "ci@bot.com"
+          git add dist
+          git commit -m "OTA update" || echo "No changes"
+          git push
+
+  # 🔥 BUILD JOB (main branch ke liye)
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: corepack enable
+
+      - run: yarn install
+
+      # ✅ Gradle cache
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('**/*.gradle*') }}
+
+      # 🔐 Decode keystore
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE }}" | base64 --decode > android/app/release.keystore
+
+      # 🚀 Build AAB (Play Store)
+      - name: Build AAB
+        run: |
+          cd android
+          ./gradlew bundleRelease
+
+      # 📦 Upload AAB
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
