@@ -8,13 +8,15 @@ on:
 
 jobs:
 
-  # 🔥 OTA JOB (sirf ota branch ke liye)
+  # 🔥 OTA JOB
   ota:
     if: github.ref == 'refs/heads/ota'
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: true   # ✅ important for push
 
       - uses: actions/setup-node@v4
         with:
@@ -22,9 +24,14 @@ jobs:
 
       - run: corepack enable
 
-      - run: yarn install
+      # ✅ FIX 1: Clean + stable install
+      - name: Clean Yarn Cache
+        run: yarn cache clean
 
-      # ✅ Bundle build
+      - name: Install deps
+        run: yarn install --frozen-lockfile
+
+      # ✅ Bundle
       - name: Build OTA Bundle
         run: |
           npx react-native bundle \
@@ -34,22 +41,22 @@ jobs:
           --bundle-output dist/index.android.bundle \
           --assets-dest dist
 
-      # ✅ ZIP create
+      # ✅ ZIP
       - name: Zip OTA
         run: |
           cd dist
           zip -r ota.zip .
 
-      # ✅ Push to repo (CDN use ke liye)
+      # ✅ FIX 2: Push with safety
       - name: Commit OTA
         run: |
           git config --global user.name "ci"
           git config --global user.email "ci@bot.com"
           git add dist
           git commit -m "OTA update" || echo "No changes"
-          git push
+          git push origin ota
 
-  # 🔥 BUILD JOB (main branch ke liye)
+  # 🔥 BUILD JOB
   build:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -63,9 +70,13 @@ jobs:
 
       - run: corepack enable
 
-      - run: yarn install
+      # ✅ same fix here
+      - name: Clean Yarn Cache
+        run: yarn cache clean
 
-      # ✅ Gradle cache
+      - name: Install deps
+        run: yarn install --frozen-lockfile
+
       - uses: actions/cache@v4
         with:
           path: |
@@ -73,18 +84,15 @@ jobs:
             ~/.gradle/wrapper
           key: gradle-${{ hashFiles('**/*.gradle*') }}
 
-      # 🔐 Decode keystore
       - name: Decode Keystore
         run: |
           echo "${{ secrets.KEYSTORE }}" | base64 --decode > android/app/release.keystore
 
-      # 🚀 Build AAB (Play Store)
       - name: Build AAB
         run: |
           cd android
           ./gradlew bundleRelease
 
-      # 📦 Upload AAB
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
