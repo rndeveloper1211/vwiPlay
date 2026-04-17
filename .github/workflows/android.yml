@@ -7,7 +7,6 @@ on:
       - ota
 
 jobs:
-
   # 🔥 OTA JOB
   ota:
     if: github.ref == 'refs/heads/ota'
@@ -16,24 +15,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: true   # ✅ important for push
+          persist-credentials: true
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'yarn' # ✅ Built-in stable caching
 
       - run: corepack enable
 
-      # ✅ FIX 1: Clean + stable install
-      - name: Clean Yarn Cache
-        run: yarn cache clean
+      - name: Install dependencies
+        # --network-concurrency 1 use karne se corruption ke chances khatam ho jate hain
+        run: yarn install --frozen-lockfile --network-concurrency 1
 
-      - name: Install deps
-        run: yarn install --frozen-lockfile
-
-      # ✅ Bundle
       - name: Build OTA Bundle
         run: |
+          mkdir -p dist
           npx react-native bundle \
           --platform android \
           --dev false \
@@ -41,19 +38,17 @@ jobs:
           --bundle-output dist/index.android.bundle \
           --assets-dest dist
 
-      # ✅ ZIP
       - name: Zip OTA
         run: |
           cd dist
           zip -r ota.zip .
 
-      # ✅ FIX 2: Push with safety
       - name: Commit OTA
         run: |
-          git config --global user.name "ci"
-          git config --global user.email "ci@bot.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add dist
-          git commit -m "OTA update" || echo "No changes"
+          git commit -m "chore: OTA update [skip ci]" || echo "No changes to commit"
           git push origin ota
 
   # 🔥 BUILD JOB
@@ -67,22 +62,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'yarn' # ✅ Enable caching here too
 
       - run: corepack enable
 
-      # ✅ same fix here
-      - name: Clean Yarn Cache
-        run: yarn cache clean
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --network-concurrency 1
 
-      - name: Install deps
-        run: yarn install --frozen-lockfile
-
-      - uses: actions/cache@v4
+      - name: Cache Gradle
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       - name: Decode Keystore
         run: |
@@ -91,10 +86,11 @@ jobs:
       - name: Build AAB
         run: |
           cd android
+          chmod +x gradlew
           ./gradlew bundleRelease
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: app-release.aab
+          name: app-release
           path: android/app/build/outputs/bundle/release/app-release.aab
