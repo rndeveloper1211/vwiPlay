@@ -35,24 +35,24 @@ android {
         viewBinding true  // ✅ Yeh add karo
     }
     // FIXED: Added signingConfigs block to use your keystore properties
-    // signingConfigs {
-    //     release {
-    //         if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
-    //             storeFile file(MYAPP_UPLOAD_STORE_FILE)
-    //             storePassword MY_KEYSTORE_PASSWORD
-    //             keyAlias MY_KEY_ALIAS
-    //             keyPassword MY_KEY_PASSWORD
-    //         }
-    //     }
-    // }
-signingConfigs {
-    release {
-        storeFile file("release.keystore")
-        storePassword System.getenv("KEYSTORE_PASSWORD")
-        keyAlias System.getenv("KEY_ALIAS")
-        keyPassword System.getenv("KEY_PASSWORD")
+    signingConfigs {
+        release {
+            if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+                storeFile file(MYAPP_UPLOAD_STORE_FILE)
+                storePassword MY_KEYSTORE_PASSWORD
+                keyAlias MY_KEY_ALIAS
+                keyPassword MY_KEY_PASSWORD
+            }
+        }
     }
-}
+// signingConfigs {
+//     release {
+//         storeFile file(MYAPP_UPLOAD_STORE_FILE)
+//         storePassword MY_KEYSTORE_PASSWORD
+//         keyAlias MY_KEY_ALIAS
+//         keyPassword MY_KEY_PASSWORD
+//     }
+// }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug

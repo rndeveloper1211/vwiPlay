@@ -1,4 +1,4 @@
-import { translate } from "../../../utils/languageUtils/I18n";
+import { translate } from '../../../utils/languageUtils/I18n';
 import React, { useState } from 'react';
 import { Image, Linking, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
 import AppBarSecond from '../../drawer/headerAppbar/AppBarSecond';
@@ -12,8 +12,9 @@ import { RootState } from '../../../reduxUtils/store';
 import BackSvg from '../../drawer/svgimgcomponents/BackSvg';
 import { Button } from 'react-native-paper';
 import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-notification';
-import { APP_URLS } from '../../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../../utils/network/urls';
 import useAxiosHook from '../../../utils/network/AxiosClient';
+import FastImage from 'react-native-fast-image';
 
 const Availabilitybusiness = () => {
   const { colorConfig, userId } = useSelector((state: RootState) => state.userInfo);
@@ -63,12 +64,12 @@ const Availabilitybusiness = () => {
 
 
   const handleGoBack2 = () => {
-    navigation.navigate("Dashboard")
+    navigation.navigate('Dashboard');
 
   };
   const handleGoBack = () => {
 
-    navigation.goBack()
+    navigation.goBack();
 
   };
   const renderItem2 = ({ item, index }) => (
@@ -79,17 +80,21 @@ const Availabilitybusiness = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={[styles.topcontainer,]}>
-        <Image source={require('../../../../assets/images/radiant.png')}
+      <View style={[styles.topcontainer]}>
+        <FastImage
+
+        // source={require('../../../../assets/images/radiant.png')}
+
+        source={{uri:IMAGE_BASE_URL + 'radiant.png'}}
           style={styles.imgstyle}
           resizeMode="contain" />
-        <View style={[styles.column,]}>
-          <Text style={[styles.title,]}>{translate("Radiant")}</Text>
-          <Text style={styles.title2}>{translate("Cash_Management_Services")}</Text>
+        <View style={[styles.column]}>
+          <Text style={[styles.title]}>{translate('Radiant')}</Text>
+          <Text style={styles.title2}>{translate('Cash_Management_Services')}</Text>
         </View>
       </View>
       <ScrollView style={styles.container}>
-        <Text style={styles.header}>{translate("Availability_of_business")}</Text>
+        <Text style={styles.header}>{translate('Availability_of_business')}</Text>
 
         <FlashList
           data={Inductionform}
@@ -101,7 +106,7 @@ const Availabilitybusiness = () => {
               <DynamicButton
                 title={'Submit for registration'}
                 onPress={() => {
-                  check_Interest()
+                  check_Interest();
                 }}
               />
             </AlertNotificationRoot>
@@ -115,7 +120,7 @@ const Availabilitybusiness = () => {
             onPress={handleGoBack}
             icon={() => <BackSvg size={15} color={colorConfig.primaryColor} />}
           >
-            <Text style={[styles.goBackText, { color: colorConfig.primaryColor, }]}>{'Go Back'}</Text>
+            <Text style={[styles.goBackText, { color: colorConfig.primaryColor }]}>{'Go Back'}</Text>
           </Button>
 
 
@@ -148,7 +153,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center',
     marginTop: hScale(4),
-    alignItems: 'center'
+    alignItems: 'center',
   },
   paragraph: {
     marginBottom: 0,
@@ -166,7 +171,7 @@ const styles = StyleSheet.create({
     color: '#322254',
     textTransform: 'uppercase',
     marginBottom: hScale(4),
-    textAlign: 'center'
+    textAlign: 'center',
   },
   topcontainer: {
     flexDirection: 'row',
@@ -177,7 +182,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: wScale(4),
     backgroundColor: '#ffe066',
-    borderColor: '#fccb0a'
+    borderColor: '#fccb0a',
   },
   imgstyle: {
     width: wScale(90),
@@ -226,7 +231,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 10
+    margin: 10,
   },
   glassText: {
     color: 'rgba(255, 255, 255, 0.2)',

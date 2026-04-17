@@ -1,209 +1,134 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import 'react-native-gesture-handler';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ToastProvider } from 'react-native-toast-notifications';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
-import 'react-native-reanimated';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'; // Zaroori import
+import 'react-native-reanimated';   // 👈 MUST ADD
 import { store, persistor } from './src/reduxUtils/store';
-import RNBootSplash from "react-native-bootsplash";
+import RNBootSplash from 'react-native-bootsplash';
 import { AppContainer } from './src/AppContainer';
 import { navigationRef } from './src/utils/navigation/NavigationService';
 import { setUnlocked } from './src/reduxUtils/store/userInfoSlice';
 import { PaperProvider } from 'react-native-paper';
-import OtaHotUpdate from 'react-native-ota-hot-update';
-import firestore from '@react-native-firebase/firestore';
-
-type Step = 'idle' | 'checking' | 'downloading' | 'installing' | 'restarting';
-
-const STEPS = [
-  { key: 'checking',    label: 'Update check ho raha hai...' },
-  { key: 'downloading', label: 'Download ho raha hai...'     },
-  { key: 'installing',  label: 'Install ho raha hai...'      },
-  { key: 'restarting',  label: 'App restart ho rahi hai...'  },
-];
-
-// ─── OTA UPDATE ───
-const checkUpdate = async (setStep: (s: Step) => void) => {
-  try {
-    setStep('checking');
-
-    const doc = await firestore().collection('config').doc('ota').get();
-
-    if (!doc.exists || !doc.data()) {
-      console.log('⚠️ [OTA] Firebase config nahi mila!');
-      setStep('idle');
-      return;
-    }
-
-    const { otaBundleUrl, updateAvailable } = doc.data() as {
-      otaBundleUrl: string;
-      updateAvailable: boolean;
-    };
-
-    if (!updateAvailable) {
-      console.log('✅ [OTA] Koi update nahi!');
-      setStep('idle');
-      return;
-    }
-
-    setStep('downloading');
-
-OtaHotUpdate.downloadBundleUri(otaBundleUrl, {
-  fileType: 'zip',
-  restart: true,
-  onSuccess: async () => {
-    setStep('installing');
-    await firestore().collection('config').doc('ota').update({
-      updateAvailable: false,
-    });
-    setStep('restarting');
-  },
-  onError: (err) => {
-    console.log('❌ [OTA] Error:', err);
-    setStep('idle');
-  },
-});
-
-  } catch (err) {
-    console.log('💥 [OTA] Failed:', err);
-    setStep('idle');
-  }
-};
-
-// ─── UPDATE OVERLAY ───
-const UpdateOverlay = ({ currentStep }: { currentStep: Step }) => (
-  <View style={styles.overlay}>
-    <View style={styles.box}>
-      <Text style={styles.title}>App Update</Text>
-
-      {STEPS.map((step, index) => {
-        const stepKeys = STEPS.map(s => s.key);
-        const currentIndex = stepKeys.indexOf(currentStep);
-        const stepIndex = index;
-
-        const isDone    = stepIndex < currentIndex;
-        const isActive  = step.key === currentStep;
-        const isPending = stepIndex > currentIndex;
-
-        return (
-          <View key={step.key} style={styles.stepRow}>
-            <View style={[
-              styles.stepDot,
-              isDone   && styles.dotDone,
-              isActive && styles.dotActive,
-              isPending && styles.dotPending,
-            ]}>
-              {isDone   && <Text style={styles.dotText}>✓</Text>}
-              {isActive && <ActivityIndicator size="small" color="#fff" />}
-              {isPending && <Text style={styles.dotTextPending}>{index + 1}</Text>}
-            </View>
-
-            <Text style={[
-              styles.stepLabel,
-              isDone    && styles.labelDone,
-              isActive  && styles.labelActive,
-              isPending && styles.labelPending,
-            ]}>
-              {step.label}
-            </Text>
-          </View>
-        );
-      })}
-
-      <Text style={styles.hint}>Kripya app band mat karein...</Text>
-    </View>
-  </View>
-);
-
-const styles = StyleSheet.create({
-  overlay: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.88)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 9999,
-  },
-  box: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 16,
-    padding: 28,
-    width: '82%',
-    alignItems: 'center',
-  },
-  title: {
-    color: '#ffffff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 24,
-  },
-  stepRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    marginBottom: 16,
-  },
-  stepDot: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  dotDone:    { backgroundColor: '#22c55e' },
-  dotActive:  { backgroundColor: '#3b82f6' },
-  dotPending: { backgroundColor: '#374151' },
-  dotText:        { color: '#fff', fontSize: 14, fontWeight: 'bold' },
-  dotTextPending: { color: '#9ca3af', fontSize: 12 },
-  stepLabel:  { fontSize: 14 },
-  labelDone:    { color: '#22c55e' },
-  labelActive:  { color: '#ffffff', fontWeight: 'bold' },
-  labelPending: { color: '#6b7280' },
-  hint: {
-    color: '#6b7280',
-    fontSize: 11,
-    marginTop: 20,
-    textAlign: 'center',
-  },
-});
-
-// ─── APP CONTENT ───
+import { useToast } from 'react-native-toast-notifications';
+import OtUpdate  from 'react-native-ota-hot-update';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 const AppContent = () => {
+  const toast = useToast();
+
   const language = useSelector((state: any) => state.userInfo.appLanguage);
   const dispatch = useDispatch();
 
+  const VERSION_URL = 'https://raw.githubusercontent.com/rndeveloper1211/vwi-ota/main/version.json';
+const checkOta = async () => {
+  try {
+    const res = await fetch(VERSION_URL);
+    const data = await res.json();
+
+    const installed = Number(await OtUpdate.getCurrentVersion()) || 0;
+    const latest = Number(data.version);
+
+    console.log('Installed:', installed, 'Latest:', latest);
+
+    // ❗ extra safety
+    if (!latest || isNaN(latest)) {
+      console.log('Invalid OTA version from server');
+      return;
+    }
+
+    if (latest > installed) {
+      console.log('New update found');
+      startUpdate(data);
+    } else {
+      console.log('Already latest version');
+
+      toast.show(`Welcome`, {
+        type: 'success',
+        placement: 'top',
+        duration: 1200,
+      });
+    }
+
+  } catch (error) {
+    console.log('OTA check failed', error);
+  }
+};
+
+const startUpdate = async (data: any) => {
+  toast.show(`Downloading v${data.version}...`, {
+    type: 'info',
+    placement: 'top',
+  });
+
+  try {
+    await OtUpdate.downloadBundleUri(
+      ReactNativeBlobUtil,
+      data.bundle_url,
+      Number(data.version),
+      {
+        restartAfterInstall: true,
+        restartDelay: 1000,
+
+        updateSuccess() {
+          console.log('✅ OTA Updated to version:', data.version);
+
+          toast.show(`Updated to v${data.version}`, {
+            type: 'success',
+            placement: 'top',
+          });
+        },
+
+        updateFail(error) {
+          console.error('❌ Update Failed:', error);
+
+          toast.show('Update Failed. Check connection.', {
+            type: 'danger',
+          });
+        },
+
+        progress(received, total) {
+          if (total > 0) {
+            const percent = Math.floor((received / total) * 100);
+            console.log(`Download: ${percent}%`);
+          }
+        },
+      }
+    );
+  } catch (error) {
+    console.error('OTA execution error:', error);
+  }
+};
   useEffect(() => {
+checkOta();
+    // Language badalte hi agar lock/unlock state reset karni hai toh
     dispatch(setUnlocked(false));
   }, [dispatch, language]);
-
   return (
     <NavigationContainer
+
       key={language}
       ref={navigationRef}
-      onReady={() => { RNBootSplash.hide({ fade: true }); }}
+      onReady={() => {
+        RNBootSplash.hide({ fade: true });
+      }}
     >
       <AppContainer />
     </NavigationContainer>
   );
 };
 
-// ─── MAIN APP ───
 function App() {
-  const [currentStep, setCurrentStep] = useState<Step>('idle');
-
   useEffect(() => {
- //   checkUpdate(setCurrentStep);
+    const isFabric = global?.nativeFabricUIManager != null;
+    const isBridgeless = global?.RN$Bridgeless === true;
+    const isHermes = !!global?.HermesInternal;
 
     if (__DEV__) {
-      const isFabric = global?.nativeFabricUIManager != null;
-      const isBridgeless = global?.RN$Bridgeless === true;
-      const isHermes = !!global?.HermesInternal;
       console.log('--- SYSTEM CHECK ---');
       console.log('Fabric Enabled:', isFabric);
       console.log('Bridgeless Mode:', isBridgeless);
@@ -213,24 +138,25 @@ function App() {
   }, []);
 
   return (
+    /** * STEP 1: GestureHandlerRootView sabse top par hona chahiye
+     * STEP 2: KeyboardProvider pure app ke insets ko handle karega
+     */
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <BottomSheetModalProvider>
           <ToastProvider>
             <Provider store={store}>
               <PaperProvider>
+
                 <PersistGate loading={null} persistor={persistor}>
                   <AppContent />
+
                 </PersistGate>
               </PaperProvider>
+
             </Provider>
           </ToastProvider>
         </BottomSheetModalProvider>
-
-        {currentStep !== 'idle' && (
-          <UpdateOverlay currentStep={currentStep} />
-        )}
-
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

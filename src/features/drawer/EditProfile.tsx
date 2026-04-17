@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, ScrollView, Alert, Modal, TouchableOpacity, Image, ToastAndroid, } from 'react-native';
 import useAxiosHook from '../../utils/network/AxiosClient';
-import { APP_URLS } from '../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../utils/network/urls';
 import FlotingInput from './securityPages/FlotingInput';
 import { hpScale, hScale, SCREEN_HEIGHT, wScale } from '../../utils/styles/dimensions';
 import AppBarSecond from './headerAppbar/AppBarSecond';
@@ -17,6 +17,7 @@ import { onReceiveNotification2 } from '../../utils/NotificationService';
 import { useNavigation } from '../../utils/navigation/NavigationService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { check, PERMISSIONS, RESULTS, openSettings, request } from 'react-native-permissions';
+import FastImage from 'react-native-fast-image';
 
 const EditProfile = ({ route }) => {
   const { profileData } = route.params;
@@ -371,15 +372,15 @@ const handleImageSelect = async () => {
         <View style={[styles.imageContainer, {
           backgroundColor: colorConfig.secondaryColor,
         }]}>
-          {image ? <Image
+          {image ? <FastImage
             source={{
               uri: image
                 ? `http://${APP_URLS.baseWebUrl}` + image
                 : `data:image/jpeg;base64,` + selectedImage,
             }}
             style={styles.profileImage}
-          /> : <Image
-            source={require('../drawer/assets/bussiness-man.png')} // local image path
+          /> : <FastImage
+            source={{uri :`${IMAGE_BASE_URL}bussiness-man.png`}} // local image path
             style={styles.profileImage}
           />}
 
@@ -392,16 +393,16 @@ const handleImageSelect = async () => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}>
         <View style={[styles.modalContainer, { backgroundColor: `${colorConfig.secondaryColor}/20` }]}>
-             {image ? <Image
+             {image ? <FastImage
             source={{
               uri: image
                 ? `http://${APP_URLS.baseWebUrl}` + image
                 : `data:image/jpeg;base64,` + selectedImage,
             }}
             style={styles.profileImage}
-          /> : <Image
+          /> : <FastImage
           // ../drawer/assets/bussiness-man.png
-            source={require('../drawer/assets/bussiness-man.png')} // local image path
+            source={{uri :`${IMAGE_BASE_URL}bussiness-man.png`}} // local image path
             style={styles.largeImage}
           />}
 

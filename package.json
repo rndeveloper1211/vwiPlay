@@ -10,6 +10,8 @@
   "lint": "eslint .",
   "start": "react-native start",
   "test": "jest",
+    "install:apk": "adb install -r android/app/build/outputs/apk/release/app-release.apk",
+
   "postinstall": "patch-package",
   "clean": "cd android && ./gradlew clean && cd ..",
   "bundle:android": "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output ./ota-bundle/index.android.bundle --assets-dest ./ota-bundle/",

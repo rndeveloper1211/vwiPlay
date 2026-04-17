@@ -1,7 +1,7 @@
 import { translate } from "../../../utils/languageUtils/I18n";
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, ImageBackground, Linking } from 'react-native';
-import { APP_URLS } from '../../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../../utils/network/urls';
 import useAxiosHook from '../../../utils/network/AxiosClient';
 import AppBarSecond from '../../drawer/headerAppbar/AppBarSecond';
 import { hScale, wScale } from '../../../utils/styles/dimensions';
@@ -44,7 +44,7 @@ const CmsShowPayoutStructure = () => {
     return (
         <View style={{ flex: 1, marginBottom: hScale(10) }}>
             <View>
-                <ImageBackground source={require('../../../../assets/images/cmsTableB.jpeg')}
+                <ImageBackground source={{uri: IMAGE_BASE_URL + 'cmsTableB.jpeg'}}
                     resizeMode='cover'
                     style={styles.bgImage}>
                     <Text style={styles.title}>{translate("RCE_Payout_Structure")}</Text>

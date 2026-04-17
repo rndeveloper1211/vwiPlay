@@ -6,9 +6,10 @@ import AppBarSecond from "../../drawer/headerAppbar/AppBarSecond";
 import CheckSvg from "../../drawer/svgimgcomponents/CheckSvg";
 import ViewShot, { captureRef } from "react-native-view-shot";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { APP_URLS } from "../../../utils/network/urls";
+import { APP_URLS, IMAGE_BASE_URL } from "../../../utils/network/urls";
 import Share from "react-native-share";
 import { shareSlipImage } from "../../../utils/shareSlipImage ";
+import FastImage from "react-native-fast-image";
 
 const PrepaySlipSummary = ({ route, }) => {
     const { slipData, action } = route.params;
@@ -94,13 +95,22 @@ console.log(action);
                     }}>
                     <View style={styles.topcontainer}>
 
-                        <Image source={require('../../../../assets/images/radiant.png')} style={styles.imgstyle} resizeMode="contain" />
+                        <FastImage
+                        
+                        source={{uri:IMAGE_BASE_URL+'radiant.png'}}
+                         style={styles.imgstyle} resizeMode="contain" />
                         <View>
                             <Text style={styles.title}>{translate("Radiant")}</Text>
                             <Text style={styles.title2}>{translate("CASH_MANAGEMENT_SERVICES_LIMITED")}</Text>
                             <Text style={styles.companyISO}>{translate("An_ISO_9001_2015_Company")}</Text>
                         </View>
-                        <Image source={require('../../../../assets/images/cmsImg/CmsSlipQr.jpg')}
+                        <FastImage
+                        
+                        // source={require('../../../../assets/images/cmsImg/CmsSlipQr.jpg')}
+                        source={{uri:IMAGE_BASE_URL+'CmsSlipQr.jpg'}}
+
+
+
                             style={{ width: wScale(70), height: hScale(70), }} resizeMode='center' />
                     </View>
 
@@ -155,7 +165,10 @@ console.log(action);
                         </View>
 
                         <View style={styles.rceSection}>
-                            <Image source={{ uri: slipData.PhotoName }} style={styles.avatar} resizeMode='stretch' />
+                            <FastImage
+                             source={{ uri: slipData.PhotoName }}
+                            
+                            style={styles.avatar} resizeMode='stretch' />
                             <View style={{ flex: 1 }}>
                                 <View style={styles.row}>
                                     <Text style={[styles.rceText, styles.bold]}>{translate("RCEs_Name")}</Text>

@@ -29,6 +29,7 @@ import { APP_URLS } from './utils/network/urls';
 import useAxiosHook from './utils/network/AxiosClient';
 import { useLocationHook } from './hooks/useLocationHook';
 import { useNavigation } from './utils/navigation/NavigationService';
+import FastImage from 'react-native-fast-image';
 
 const { width } = Dimensions.get('window');
 
@@ -309,8 +310,10 @@ const SelfieScreen: React.FC = () => {
               ]}
             >
               {base64Img ? (
-                <Image
-                  source={{ uri: `data:image/jpeg;base64,${base64Img}` }}
+                <FastImage
+                  source={{ 
+                    priority: FastImage.priority.high,
+                    uri: `data:image/jpeg;base64,${base64Img}` }}
                   style={styles.capturedImage}
                 />
               ) : (

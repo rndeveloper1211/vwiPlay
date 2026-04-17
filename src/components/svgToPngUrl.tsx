@@ -1,5 +1,6 @@
 import React, { memo, useState } from "react";
-import { Image, View } from "react-native";
+import { View } from "react-native";
+import FastImage from "react-native-fast-image"; // ← FastImage Import
 import { SvgUri } from "react-native-svg";
 import { wScale } from "../utils/styles/dimensions";
 
@@ -16,9 +17,10 @@ interface SmartIconProps {
 const isSvgUrl = (url: string): boolean =>
   url?.toLowerCase().includes(".svg");
 
-// ─── PNG Converter ────────────────────────────────────────────
+// ─── PNG Converter (Images.weserv.nl caching ke liye achha hai) ──────────────────
 const svgToPngUrl = (svgUrl: string, size: number): string => {
   if (!svgUrl) return "";
+  // Agar URL pehle se PNG/JPG hai toh weserv ki zaroorat nahi, par fallback ke liye theek hai
   return `https://images.weserv.nl/?url=${encodeURIComponent(svgUrl)}&output=png&w=${Math.round(size)}&h=${Math.round(size)}&fit=contain`;
 };
 
@@ -30,7 +32,6 @@ const SmartIcon = memo(
     const finalW     = width  ?? scaledSize;
     const finalH     = height ?? scaledSize;
 
-    // SVG → SvgUri pehle, PNG → Image pehle
     const [stage, setStage] = useState<"svg" | "png" | "failed">(
       isSvg ? "svg" : "png"
     );
@@ -39,8 +40,8 @@ const SmartIcon = memo(
     if (stage === "failed") return null;
 
     const imgStyle = {
-      width:  finalW as number,
-      height: finalH as number,
+      width:  finalW as any,
+      height: finalH as any,
     };
 
     // ── SVG Stage ─────────────────────────────────────────
@@ -51,18 +52,22 @@ const SmartIcon = memo(
             width="100%"
             height="100%"
             uri={uri}
-            onError={() => setStage("png")}   // ← fail → PNG try
+            onError={() => setStage("png")} // SVG fail hua toh PNG try karega
           />
         </View>
       );
     }
 
-    // ── PNG Stage ─────────────────────────────────────────
+    // ── PNG/Raster Stage (FastImage Added) ─────────────────
     return (
-      <Image
-        source={{ uri: svgToPngUrl(uri, scaledSize) }}
+      <FastImage
         style={imgStyle}
-        resizeMode="contain"
+        source={{
+          uri: isSvg ? svgToPngUrl(uri, scaledSize) : uri, // Agar SVG stage fail hokar yahan aaya toh convert karega
+          priority: FastImage.priority.high,
+          cache: FastImage.cacheControl.immutable, // Behtar caching ke liye
+        }}
+        resizeMode={FastImage.resizeMode.contain}
         onError={() => {
           setStage("failed");
           onError?.();

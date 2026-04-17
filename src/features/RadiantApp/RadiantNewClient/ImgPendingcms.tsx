@@ -1,4 +1,4 @@
-import { translate } from "../../../utils/languageUtils/I18n";
+import { translate } from '../../../utils/languageUtils/I18n';
 import React, { useEffect, useState } from 'react';
 import { Image, Linking, ScrollView, StyleSheet, Text, View, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -6,12 +6,13 @@ import { Button } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../reduxUtils/store';
 import { hScale, wScale } from '../../../utils/styles/dimensions';
-import { APP_URLS } from '../../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../../utils/network/urls';
 import useAxiosHook from '../../../utils/network/AxiosClient';
 import BackSvg from '../../drawer/svgimgcomponents/BackSvg';
 import DocPaddingSvg from '../../drawer/svgimgcomponents/DocPaddingSvg';
 import LocationSvg from '../../drawer/svgimgcomponents/LocationSvg';
 import PaddingSvg2 from '../../drawer/svgimgcomponents/PaddingSvg2';
+import FastImage from 'react-native-fast-image';
 
 
 const ImgPendingcms = () => {
@@ -38,7 +39,7 @@ const ImgPendingcms = () => {
       setStslist(res);
       setMessage(message);
       setLoading(false);
-      console.log(res, '*96532.65')
+      console.log(res, '*96532.65');
       if (status === 'Success' && message === '') {
         const res2 = await post({ url: APP_URLS.RadiantCEIntersetCheck });
         const status2 = res2?.Content?.ADDINFO?.sts;
@@ -49,7 +50,7 @@ const ImgPendingcms = () => {
         setStslist(res2);
         setMessage(message2);
         setLoading(false);
-        console.log(res2, '*96532.1111111111111111111')
+        console.log(res2, '*96532.1111111111111111111');
 
       }
     } catch (error) {
@@ -70,7 +71,7 @@ const ImgPendingcms = () => {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colorConfig.primaryColor} />
-        <Text style={styles.loadingText}>{translate("Loading_your_status")}</Text>
+        <Text style={styles.loadingText}>{translate('Loading_your_status')}</Text>
       </View>
     );
   }
@@ -81,14 +82,17 @@ const ImgPendingcms = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={[styles.topcontainer]}>
-        <Image
-          source={require('../../../../assets/images/radiant.png')}
+        <FastImage
+
+          // source={require('../../../../assets/images/radiant.png')}
+
+          source={{uri:IMAGE_BASE_URL + 'radiant.png'}}
           style={styles.imgstyle}
           resizeMode="contain"
         />
         <View style={[styles.column]}>
-          <Text style={styles.title}>{translate("Radiant")}</Text>
-          <Text style={styles.title2}>{translate("Cash_Management_Services")}</Text>
+          <Text style={styles.title}>{translate('Radiant')}</Text>
+          <Text style={styles.title2}>{translate('Cash_Management_Services')}</Text>
         </View>
       </View>
       <ScrollView style={styles.container}>
@@ -97,12 +101,12 @@ const ImgPendingcms = () => {
           <PaddingSvg2 size={200} />
 
 
-          <Text style={styles.header}>{translate("Selfie_verification")}</Text>
-          <Text style={styles.header2}>{translate("is_Pending")}</Text>
+          <Text style={styles.header}>{translate('Selfie_verification')}</Text>
+          <Text style={styles.header2}>{translate('is_Pending')}</Text>
         </View>
 
         <View style={[styles.paragraphContainer, { backgroundColor: color1 }]}>
-          <Text style={styles.paragraph}>{translate("key_selfiever_171")}</Text>
+          <Text style={styles.paragraph}>{translate('key_selfiever_171')}</Text>
 
         </View>
 
@@ -118,7 +122,7 @@ const ImgPendingcms = () => {
             onPress={handleGoBack}
             icon={() => <BackSvg size={15} color={colorConfig.primaryColor} />}
           >
-            <Text style={[styles.goBackText, { color: colorConfig.primaryColor }]}>{translate("Go_Back")}</Text>
+            <Text style={[styles.goBackText, { color: colorConfig.primaryColor }]}>{translate('Go_Back')}</Text>
           </Button>
 
           <Button
@@ -126,7 +130,7 @@ const ImgPendingcms = () => {
             onPress={handleWebsiteLink}
             labelStyle={{ color: colorConfig.secondaryColor }}
           >
-            <Text style={[styles.websiteLinkText, { color: colorConfig.secondaryColor }]}>{translate("Company_Website_Link")}</Text>
+            <Text style={[styles.websiteLinkText, { color: colorConfig.secondaryColor }]}>{translate('Company_Website_Link')}</Text>
           </Button>
         </View>
       </ScrollView>
@@ -149,7 +153,7 @@ const styles = StyleSheet.create({
     marginTop: hScale(10),
     fontSize: wScale(16),
     color: '#888',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   headerContainer: {
     backgroundColor: '#f1f1f1',
@@ -161,7 +165,7 @@ const styles = StyleSheet.create({
   pandingimgstyle: {
     height: hScale(100),
     width: wScale(210),
-    marginBottom: hScale(20)
+    marginBottom: hScale(20),
   },
   header: {
     fontSize: wScale(44),
@@ -181,7 +185,7 @@ const styles = StyleSheet.create({
     // marginTop: hScale(-25),
     borderBottomWidth: 1,
     paddingBottom: hScale(10),
-    lineHeight: 60
+    lineHeight: 60,
   },
   subHeader: {
     fontSize: wScale(30),
@@ -193,7 +197,7 @@ const styles = StyleSheet.create({
     marginBottom: hScale(10),
     paddingVertical: hScale(10),
     paddingHorizontal: wScale(10),
-    borderRadius: 8
+    borderRadius: 8,
   },
   paragraph: {
     marginBottom: 0,

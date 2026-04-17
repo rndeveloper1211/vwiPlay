@@ -18,7 +18,7 @@ import AppBarSecond from '../../drawer/headerAppbar/AppBarSecond';
 import { hScale, SCREEN_WIDTH, wScale } from '../../../utils/styles/dimensions';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { APP_URLS } from '../../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../../utils/network/urls';
 import useAxiosHook from '../../../utils/network/AxiosClient';
 import ShowLoader from '../../../components/ShowLoder';
 import NoDatafound from '../../drawer/svgimgcomponents/Nodatafound';
@@ -27,6 +27,7 @@ import ViewShot, { captureRef } from 'react-native-view-shot';
 import Share from "react-native-share";
 import LottieView from 'lottie-react-native';
 import SmartIcon from "../../../components/svgToPngUrl";
+import FastImage from "react-native-fast-image";
 
 const CmsACList = () => {
     const { colorConfig } = useSelector((state: RootState) => state.userInfo);
@@ -183,7 +184,7 @@ const CmsACList = () => {
                         alignSelf: 'center',
                         backgroundColor: '#fff'
                     }}>
-                        <Image source={{ uri: item.qrimage }} style={{ width: '100%', height: '100%', }}
+                        <FastImage source={{ uri: item.qrimage }} style={{ width: '100%', height: '100%', }}
                             resizeMode='contain' />
                     </View>
                     <View style={[styles.infoContainer, { backgroundColor: '#fff' }]}>
@@ -229,7 +230,11 @@ const CmsACList = () => {
                 <View style={styles.container}>
 
                     <View style={[styles.topviw, { borderColor: colorConfig.secondaryColor }]}>
-                        <Image style={styles.toimg} source={require('../../../../assets/images/radiant.png')} />
+                        <FastImage style={styles.toimg} 
+                        // source={('../../../../assets/images/radiant.png')} 
+
+                        source={{uri:IMAGE_BASE_URL+'radiant.png'}}
+                        />
 
 
                         <Text style={styles.toptex}>{translate("key_belowist_175")}</Text>

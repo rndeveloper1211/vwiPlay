@@ -6,7 +6,7 @@ import { colors } from "../utils/styles/theme";
 import { RootState } from "../reduxUtils/store";
 import { useSelector } from "react-redux";
 import OnelineDropdownSvg from "../features/drawer/svgimgcomponents/simpledropdown";
-import { APP_URLS } from "../utils/network/urls";
+import { APP_URLS, IMAGE_BASE_URL } from "../utils/network/urls";
 import { decryptData } from "../utils/encryptionUtils";
 import useAxiosHook from "../utils/network/AxiosClient";
 import ShowLoaderBtn from './ShowLoaderBtn';
@@ -101,7 +101,7 @@ const AllBalance = () => {
         (Number(balanceInfo?.remainbal) || 0);
 
     return (
-        <ImageBackground source={require('../../assets/images/WalletBalBg.jpeg')}
+        <ImageBackground source={{uri:IMAGE_BASE_URL+'WalletBalBg.jpeg'}}
             imageStyle={styles.borderRadius}
         >
             <View style={[styles.headerview, styles.borderRadius, { backgroundColor: color1 }]}>

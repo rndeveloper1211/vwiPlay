@@ -30,6 +30,7 @@ import { useLocationHook } from "../../hooks/useLocationHook";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import SkeletonCard from '../../components/SkeletonCard';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FastImage from "react-native-fast-image";
 
 const DmtAddAccount = () => {
     const { colorConfig, Loc_Data, userId } = useSelector((state: RootState) => state.userInfo);
@@ -309,7 +310,7 @@ const insets = useSafeAreaInsets();
                             </TouchableOpacity>
                         </View>
                         <View style={sheetS.imgWrap}>
-                            {imgurl ? <Image source={{ uri: imgurl }} style={sheetS.img} resizeMode="contain" /> : <NoDatafound />}
+                            {imgurl ? <FastImage source={{ uri: imgurl }} style={sheetS.img} resizeMode="contain" /> : <NoDatafound />}
                         </View>
                     </View>
                 </BottomSheet>

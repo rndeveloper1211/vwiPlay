@@ -331,102 +331,90 @@ const faceData ={
 }
 
 const OnPressEnq2 = async (fingerprintData) => {
-  try {
+    try {
 
-    const parsedJson =
-      typeof fingerprintData?.piddataJsonString === "string"
-        ? JSON.parse(fingerprintData.piddataJsonString)
-        : fingerprintData?.piddataJsonString;
+        const raw =
+            fingerprintData?.piddataJsonString ||
+            fingerprintData?.pidDataJson ||
+            fingerprintData;
 
-    const pidData = parsedJson?.PidData;
-    if (!pidData) throw new Error("Invalid PID Data");
+        const parsedJson =
+            typeof raw === "string"
+                ? JSON.parse(raw)
+                : raw;
 
-    const DevInfo = pidData.DeviceInfo || {};
-    const Resp = pidData.Resp || {};
+        const pidData = parsedJson?.PidData;
+        if (!pidData) throw new Error("Invalid PID Data");
 
-    
+        const DevInfo = pidData.DeviceInfo || {};
+        const Resp = pidData.Resp || {};
 
-    const cardnumberORUID = {
-      adhaarNumber: aadharNumber,
-      indicatorforUID: "0",
-      nationalBankIdentificationNumber: bankid
-    };
+        const cardnumberORUID = {
+            adhaarNumber: aadharNumber,
+            indicatorforUID: "0",
+            nationalBankIdentificationNumber: bankid
+        };
 
-    const captureResponse = {
+        const captureResponse = {
+            Devicesrno:
+                DevInfo?.additional_info?.Param?.[0]?.value ||
+                DevInfo?.dc ||
+                "",
+            PidDatatype: "X",
+            Piddata: typeof pidData.Data === "object"
+                ? pidData.Data.content
+                : pidData.Data || "",
+            ci: pidData.Skey?.ci || "",
+            dc: DevInfo.dc || "",
+            dpID: DevInfo.dpId || "",
+            errCode: Resp.errCode ?? "",
+            errInfo: Resp.errInfo || "",
+            fCount: Resp.fCount || "0",
+            fType: Resp.fType || "0",
+            hmac: typeof pidData.Hmac === "object"
+                ? pidData.Hmac.content
+                : pidData.Hmac || "",
+            iCount: Resp.iCount || "0",
+            iType: Resp.iType || "0",
+            mc: DevInfo.mc || "",
+            mi: DevInfo.mi || "",
+            nmPoints: Resp.nmPoints || "0",
+            pCount: Resp.pCount || "0",
+            pType: Resp.pType || "0",
+            qScore: Resp.qScore ?? "-1",
+            rdsID: DevInfo.rdsId || "",
+            rdsVer: DevInfo.rdsVer || "",
+            sessionKey: typeof pidData.Skey === "object"
+                ? pidData.Skey.content
+                : pidData.Skey || ""
+        };
 
-      Devicesrno:
-        DevInfo?.additional_info?.Param?.[0]?.value ||
-        DevInfo?.dc ||
-        "",
+        console.log("Mapped Response for Face Auth:", JSON.stringify(captureResponse, null, 2));
 
-      PidDatatype: "X",
-
-      Piddata:
-        typeof pidData.Data === "object"
-          ? pidData.Data.content
-          : pidData.Data || "",
-
-      ci: pidData.Skey?.ci || "",
-
-      dc: DevInfo.dc || "",
-      dpID: DevInfo.dpId || "",
-
-      errCode: Resp.errCode ?? "",
-      errInfo: Resp.errInfo || "",
-
-      fCount: Resp.fCount || "0",
-      fType: Resp.fType || "0",
-
-      hmac:
-        typeof pidData.Hmac === "object"
-          ? pidData.Hmac.content
-          : pidData.Hmac || "",
-
-      iCount: Resp.iCount || "0",
-      iType: Resp.iType || "0",
-
-      mc: DevInfo.mc || "",
-      mi: DevInfo.mi || "",
-
-      nmPoints: Resp.nmPoints || "0",
-
-      pCount: Resp.pCount || "0",
-      pType: Resp.pType || "0",
-
-      qScore: Resp.qScore || "-1",
-
-      rdsID: DevInfo.rdsId || "",
-      rdsVer: DevInfo.rdsVer || "",
-
-      sessionKey:
-        typeof pidData.Skey === "object"
-          ? pidData.Skey.content
-          : pidData.Skey || ""
-    };
-
-    console.log(
-      "Mapped Response for Face Auth:",
-      JSON.stringify(captureResponse, null, 2)
-    );
-
-console.log('====================================');
-console.log(captureResponse);
-console.log('====================================');
-console.log(cardnumberORUID);
-
-    BEnQ(captureResponse, cardnumberORUID, "", true);
-
-  } catch (error) {
-
-    console.error("OnPressEnq2 Error:", error);
-    Alert.alert("Error", "Biometric processing failed.");
-
-  } finally {
-
-    //setIsLoading(false);
-
-  }
+        // ✅ Dono JSON alert mein
+        // Alert.alert(
+        //     "Face Auth Debug",
+        //     `📥 RAW INPUT:\n${JSON.stringify(fingerprintData, null, 2)}\n\n📤 MAPPED captureResponse:\n${JSON.stringify(captureResponse, null, 2)}`,
+        //     [
+        //         {
+        //             text: "Proceed",
+        //             onPress: () => BEnQ(captureResponse, cardnumberORUID, "", true),
+        //         },
+        //         {
+        //             text: "Cancel",
+        //             style: "cancel",
+        //         },
+        //     ]
+        // );
+await BEnQ(captureResponse, cardnumberORUID, "", true);
+    } catch (error) {
+        console.error("OnPressEnq2 Error:", error);
+        Alert.alert("Error", "Biometric processing failed.");
+    } finally {
+        // setIsLoading(false);
+    }
 };
+
 const saveFaceResponse = async (data) => {
   try {
 

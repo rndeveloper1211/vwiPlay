@@ -6,12 +6,13 @@ import { Button } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../reduxUtils/store';
 import { hScale, wScale } from '../../../utils/styles/dimensions';
-import { APP_URLS } from '../../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../../utils/network/urls';
 import useAxiosHook from '../../../utils/network/AxiosClient';
 import BackSvg from '../../drawer/svgimgcomponents/BackSvg';
 import DocPaddingSvg from '../../drawer/svgimgcomponents/DocPaddingSvg';
 import LocationSvg from '../../drawer/svgimgcomponents/LocationSvg';
 import PaddingSvg2 from '../../drawer/svgimgcomponents/PaddingSvg2';
+import FastImage from "react-native-fast-image";
 
 
 const Pendingcms = () => {
@@ -78,8 +79,9 @@ const Pendingcms = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={[styles.topcontainer]}>
-        <Image
-          source={require('../../../../assets/images/radiant.png')}
+        <FastImage
+          // source={require('../../../../assets/images/radiant.png')}
+          source={{uri:IMAGE_BASE_URL + 'radiant.png'}}
           style={styles.imgstyle}
           resizeMode="contain"
         />

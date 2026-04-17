@@ -13,7 +13,7 @@ import {
 import { hScale, wScale } from "../../../utils/styles/dimensions";
 import MenuIcon from "./MenuIcon";
 import useAxiosHook from "../../../utils/network/AxiosClient";
-import { APP_URLS } from "../../../utils/network/urls";
+import { APP_URLS, IMAGE_BASE_URL } from "../../../utils/network/urls";
 import { BalanceType } from "../utils";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../reduxUtils/store";
@@ -35,6 +35,7 @@ import { check, PERMISSIONS, request, RESULTS } from "react-native-permissions";
 import { setRceIdStatus } from "../../../reduxUtils/store/userInfoSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from '@react-native-community/netinfo';
+import FastImage from "react-native-fast-image";
 
 const DashboardHeader = ({ refreshPress }) => {
   const { colorConfig, IsDealer, Loc_Data, appLanguage } = useSelector(
@@ -267,12 +268,22 @@ const DashboardHeader = ({ refreshPress }) => {
                 navigation.dispatch(DrawerActions.openDrawer());
               }}
             >
-              <Image
+              {/* <Image
                 source={require("../../drawer/assets/menu2.png")}
                 style={{
                   width: wScale(40),
                   height: wScale(25),
                 }}
+              /> */}
+
+              <FastImage
+                style={{
+                  width: wScale(40),
+                  height: wScale(25),
+                }}
+              source={{
+                priority:FastImage.priority.high,
+                uri:`${IMAGE_BASE_URL}menu2.png`}}
               />
             </TouchableOpacity>
           ) : (
@@ -280,14 +291,29 @@ const DashboardHeader = ({ refreshPress }) => {
           )}
 
           {APP_URLS.AppName === "STdigiPe" ? (
-            <Image
-              source={require("../../drawer/assets/stdigipe.jpg")}
-              style={{
+            // <Image
+            //   source={require("../../drawer/assets/stdigipe.jpg")}
+            //   style={{
+            //     width: wScale(80),
+            //     height: wScale(40),
+            //     resizeMode: "contain",
+            //     marginHorizontal: wScale(20),
+            //     borderWidth: 1,
+            //   }}
+            // />
+
+            <FastImage
+resizeMode={FastImage.resizeMode.contain}
+            source={{
+            priority:'high',
+            
+              uri:`${IMAGE_BASE_URL}stdigipe.jpg`}}
+            style={{
                 width: wScale(80),
                 height: wScale(40),
-                resizeMode: "contain",
                 marginHorizontal: wScale(20),
                 borderWidth: 1,
+              
               }}
             />
           ) : (

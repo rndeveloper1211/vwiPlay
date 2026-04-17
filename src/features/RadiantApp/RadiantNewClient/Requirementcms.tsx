@@ -11,6 +11,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../reduxUtils/store';
 import BackSvg from '../../drawer/svgimgcomponents/BackSvg';
 import { Button } from 'react-native-paper';
+import { IMAGE_BASE_URL } from "../../../utils/network/urls";
+import FastImage from "react-native-fast-image";
 
 const Requirementscms = () => {
   const { colorConfig, userId } = useSelector((state: RootState) => state.userInfo);
@@ -52,7 +54,9 @@ const Requirementscms = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={[styles.topcontainer,]}>
-        <Image source={require('../../../../assets/images/radiant.png')}
+    <FastImage
+          // source={require('../../../../assets/images/radiant.png')}
+          source={{uri:IMAGE_BASE_URL + 'radiant.png'}}
           style={styles.imgstyle}
           resizeMode="contain" />
         <View style={styles.column}>

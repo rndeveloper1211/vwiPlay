@@ -1,7 +1,9 @@
-import { translate } from "../../../utils/languageUtils/I18n";
+import { translate } from '../../../utils/languageUtils/I18n';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { hScale } from '../../../utils/styles/dimensions';
+import FastImage from 'react-native-fast-image';
+import { IMAGE_BASE_URL } from '../../../utils/network/urls';
 
 const CmsFinalOtpVerification = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -19,19 +21,23 @@ const CmsFinalOtpVerification = () => {
         <TouchableOpacity>
           {/* <Ionicons name="arrow-back" size={24} color="#fff" /> */}
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{translate("Cms_Code_Verification")}</Text>
+        <Text style={styles.headerTitle}>{translate('Cms_Code_Verification')}</Text>
       </View>
 
-      <Image source={require('../../assets/checklist.png')} style={styles.image} />
+      <FastImage
+      source={{uri:IMAGE_BASE_URL + 'checklist.png'}
 
-      <Text style={styles.title}>{translate("Verification_Required")}</Text>
+
+      } style={styles.image} />
+
+      <Text style={styles.title}>{translate('Verification_Required')}</Text>
       <Text style={styles.description}>
-        Please match the number of <Text style={styles.highlight}>Notes</Text> and the <Text style={styles.highlight}>{translate("total_amount")}</Text>. If everything is okay, complete the transaction by entering the OTP. <Text style={styles.success}>{translate("The_OTP_has_been_sent_to_the_store_contact_person")}</Text> with the details of the total amount.
+        Please match the number of <Text style={styles.highlight}>Notes</Text> and the <Text style={styles.highlight}>{translate('total_amount')}</Text>. If everything is okay, complete the transaction by entering the OTP. <Text style={styles.success}>{translate('The_OTP_has_been_sent_to_the_store_contact_person')}</Text> with the details of the total amount.
       </Text>
 
       <View style={styles.infoRow}>
-        <Text>{translate("ReQ_No_VW1457842514521")}</Text>
-        <Text>{translate("Pickup_Time_10082025_1042_AM")}</Text>
+        <Text>{translate('ReQ_No_VW1457842514521')}</Text>
+        <Text>{translate('Pickup_Time_10082025_1042_AM')}</Text>
       </View>
 
       <View style={styles.table}>
@@ -44,11 +50,11 @@ const CmsFinalOtpVerification = () => {
 
       <View style={styles.checkboxRow}>
         {/* <CheckBox value={isChecked} onValueChange={setIsChecked} /> */}
-        <Text style={styles.checkboxText}>{translate("key_yesihave_181")}</Text>
+        <Text style={styles.checkboxText}>{translate('key_yesihave_181')}</Text>
       </View>
 
       <TouchableOpacity style={styles.sendOtpBtn}>
-        <Text style={styles.sendOtpText}>{translate("Send_OTP_to_Customer_Point")}</Text>
+        <Text style={styles.sendOtpText}>{translate('Send_OTP_to_Customer_Point')}</Text>
       </TouchableOpacity>
 
       <View style={styles.otpRow}>
@@ -66,7 +72,7 @@ const CmsFinalOtpVerification = () => {
       <Text style={styles.resendText}>If OTP is not received, Resend OTP</Text>
 
       <TouchableOpacity style={styles.submitBtn}>
-        <Text style={styles.submitText}>{translate("Submit_OTP")}</Text>
+        <Text style={styles.submitText}>{translate('Submit_OTP')}</Text>
       </TouchableOpacity>
     </ScrollView>
   );

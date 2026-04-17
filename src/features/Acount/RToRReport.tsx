@@ -10,12 +10,13 @@ import LinearGradient from 'react-native-linear-gradient';
 import AppBarSecond from '../drawer/headerAppbar/AppBarSecond';
 import DateRangePicker from '../../components/DateRange';
 import { hScale, wScale } from '../../utils/styles/dimensions';
-import { APP_URLS } from '../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../utils/network/urls';
 import useAxiosHook from '../../utils/network/AxiosClient';
 import { RootState } from '../../reduxUtils/store';
 import NoDatafound from '../drawer/svgimgcomponents/Nodatafound';
 import SkeletonCard from '../../components/SkeletonCard';
 import { translate } from '../../utils/languageUtils/I18n';
+import FastImage from 'react-native-fast-image';
 
 // ─── Skeleton List ────────────────────────────────────────────────────────────
 
@@ -113,7 +114,7 @@ const DealerCard = React.memo(({ item, themeColor, secondaryColor }: {
     >
       <View style={styles.cardShine} pointerEvents="none" />
 
-      <Image
+      {/* <Image
         resizeMode="cover"
         source={
           item.ProfileImages
@@ -121,8 +122,19 @@ const DealerCard = React.memo(({ item, themeColor, secondaryColor }: {
             : require('../../features/drawer/assets/bussiness-man.png')
         }
         style={styles.avatar}
-      />
+      /> */}
 
+<FastImage
+  style={styles.avatar}
+  resizeMode={FastImage.resizeMode.cover}
+  source={{
+    uri: item.ProfileImages
+      ? `http://${APP_URLS.baseWebUrl}${item.ProfileImages}` // Use https if possible
+      : `${IMAGE_BASE_URL}bussiness-man.png`,
+    priority: FastImage.priority.high,
+    cache: FastImage.cacheControl.immutable,
+  }}
+/>
       <View style={styles.headerLeft}>
         <Text style={styles.headerName} numberOfLines={1}>
           {item.FirmName || '....'}

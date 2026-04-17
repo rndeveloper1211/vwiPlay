@@ -41,90 +41,131 @@ const Aepsekycscan = () => {
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const formattedDate = `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+const capture = async (rdServicePackage) => {
+  setIsLoading(true);
+  let pidOptions = '';
 
-  const capture = async (rdServicePackage) => {
-    setIsLoading(true);
-    let pidOptions = '';
-    switch (rdServicePackage) {
-      case 'com.mantra.mfs110.rdservice':
-      case 'com.mantra.rdservice':
-        pidOptions = `<PidOptions ver="1.0"> <Opts fCount="1" fType="2" iCount="0" pCount="0" pgCount="2" format="0" pidVer="2.0" timeout="10000" wadh="E0jzJ/P8UopUHAieZn8CKqS4WPMi5ZSYXgfnlfkWjrc=" pTimeout="20000" posh="UNKNOWN" env="P"  /> <CustOpts><Param name="mantrakey" value="" /></CustOpts> </PidOptions>`;
-        break;
-      case 'com.acpl.registersdk_l1':
-      case 'com.acpl.registersdk':
-        pidOptions = `<PidOptions ver="1.0"> <Opts fCount="1" fType="2" iCount="0" pCount="0" pgCount="2" format="0" pidVer="2.0" wadh="E0jzJ/P8UopUHAieZn8CKqS4WPMi5ZSYXgfnlfkWjrc=" timeout="10000"  otp="" pTimeout="20000" posh="UNKNOWN" env="P" />  <Demo/> <CustOpts><Param name="" value="" /></CustOpts> </PidOptions>`;
-        break;
-      case 'com.idemia.l1rdservice':
-      case 'com.scl.rdservice':
-        pidOptions = `<PidOptions ver="1.0"><Opts env="P" fCount="1" fType="2" iCount="0" iType="" pCount="0" pType="" format="0" pidVer="2.0" timeout="20000" wadh="E0jzJ/P8UopUHAieZn8CKqS4WPMi5ZSYXgfnlfkWjrc=" posh="UNKNOWN" /><Demo></Demo><CustOpts><Param name="" value="" /></CustOpts></PidOptions>`;
-        break;
-    }
+  switch (rdServicePackage) {
+    case 'com.mantra.mfs110.rdservice':
+    case 'com.mantra.rdservice':
+      pidOptions = `<PidOptions ver="1.0"> <Opts fCount="1" fType="2" iCount="0" pCount="0" pgCount="2" format="0" pidVer="2.0" timeout="10000" wadh="E0jzJ/P8UopUHAieZn8CKqS4WPMi5ZSYXgfnlfkWjrc=" pTimeout="20000" posh="UNKNOWN" env="P"  /> <CustOpts><Param name="mantrakey" value="" /></CustOpts> </PidOptions>`;
+      break;
+    case 'com.acpl.registersdk_l1':
+    case 'com.acpl.registersdk':
+      pidOptions = `<PidOptions ver="1.0"> <Opts fCount="1" fType="2" iCount="0" pCount="0" pgCount="2" format="0" pidVer="2.0" wadh="E0jzJ/P8UopUHAieZn8CKqS4WPMi5ZSYXgfnlfkWjrc=" timeout="10000"  otp="" pTimeout="20000" posh="UNKNOWN" env="P" />  <Demo/> <CustOpts><Param name="" value="" /></CustOpts> </PidOptions>`;
+      break;
+    case 'com.idemia.l1rdservice':
+    case 'com.scl.rdservice':
+      pidOptions = `<PidOptions ver="1.0"><Opts env="P" fCount="1" fType="2" iCount="0" iType="" pCount="0" pType="" format="0" pidVer="2.0" timeout="20000" wadh="E0jzJ/P8UopUHAieZn8CKqS4WPMi5ZSYXgfnlfkWjrc=" posh="UNKNOWN" /><Demo></Demo><CustOpts><Param name="" value="" /></CustOpts></PidOptions>`;
+      break;
+  }
 
-    openFingerPrintScanner(rdServicePackage, pidOptions)
-      .then(async (res) => {
-        setIsLoading(true);
-        console.log("Fingerprint Response:", res);
-        //  {"isDeviceDriverFound": false, "message": "Device Driver not found", "status": 0}
-        if (res.isDeviceDriverFound === false) {
-          Alert.alert(res.message);
-          return
-        }
-        //await logToFirebase("fingerprint_response", { rdServicePackage, pidOptions, response: res });
+  openFingerPrintScanner(rdServicePackage, pidOptions)
+    .then(async (res) => {
+      // ✅ FIX 1: setIsLoading(true) hata di - upar se already true hai
 
-        if (res.errorCode == 720) {
-          setFingerprintData(720);
-          setIsLoading(false);
-        } else if (res.status === -1) {
-          setFingerprintData(-1);
-          setIsLoading(false);
-        } else if (res.status === 1 || res.errorCode == 0) {
-          setIsLoading(true);
+      console.log("Fingerprint Response:", res);
 
-          OnPressEnq(res.piddataJsonString, res.piddataXML);
-        }
-      })
-      .catch(async (error) => {
+      if (res.isDeviceDriverFound === false) {
+        Alert.alert(res.message);
+        setIsLoading(false); // ✅ FIX 2: ye add kiya
+        return;
+      }
+
+      if (res.errorCode == 720) {
         setFingerprintData(720);
         setIsLoading(false);
-        Alert.alert('Please check if the device is connected.');
-      });
-  };
-
-  const OnPressEnq = async (fingerprintDataString, pidDataXml) => {
+      } else if (res.status === -1) {
+        setFingerprintData(-1);
+        setIsLoading(false);
+      } else if (res.status === 1 || res.errorCode == 0) {
+        setIsLoading(true);
+        OnPressEnq(res.piddataJsonString, res.piddataXML);
+      }
+    })
+    .catch(async (error) => {
+      setFingerprintData(720);
+      setIsLoading(false);
+      Alert.alert('Please check if the device is connected.');
+    });
+};
+const OnPressEnq = async (fingerprintDataString, pidDataXml) => {
     try {
-      setIsLoading(true);
-      let parsedJson = typeof fingerprintDataString === "string" ? JSON.parse(fingerprintDataString) : fingerprintDataString;
-      const pidData = parsedJson?.PidData;
-      const DevInfo = pidData.DeviceInfo || {};
-      const Resp = pidData.Resp || {};
-      if (Resp.errCode !== "0") throw new Error(Resp.errInfo || "Fingerprint capture failed");
 
-      const params = DevInfo.additional_info?.Param || [];
-      const srNo = params.find(p => p.name?.toLowerCase() === "srno")?.value || "";
+        // ✅ piddataJsonString ke andar PidData hai
+        const raw = fingerprintDataString?.piddataJsonString || fingerprintDataString;
 
-      const cardnumberORUID = { adhaarNumber: aadharNumber, indicatorforUID: "0", nationalBankIdentificationNumber: "" };
+        const parsedJson = typeof raw === 'string'
+            ? JSON.parse(raw)
+            : raw;
 
-      const captureResponse = {
-        Devicesrno: srNo, PidDatatype: "X", Piddata: pidData.Data?.content || "",
-        ci: pidData.Skey?.ci || "", dc: DevInfo.dc || "", dpID: DevInfo.dpId || "",
-        errCode: Resp.errCode || "0", errInfo: Resp.errInfo || "Success",
-        fCount: Resp.fCount || "1", fType: Resp.fType || "2", hmac: pidData.Hmac || "",
-        iCount: Resp.iCount || "0", iType: "0", mc: DevInfo.mc || "", mi: DevInfo.mi || "",
-        nmPoints: Resp.nmPoints || "0", pCount: Resp.pCount || "0", pType: "0",
-        qScore: Resp.qScore || "0", rdsID: DevInfo.rdsId || "", rdsVer: DevInfo.rdsVer || "",
-        sessionKey: pidData.Skey?.content || ""
-      };
+        const pidData = parsedJson?.PidData;
+        if (!pidData) throw new Error("Invalid PID Data");
 
-      console.log('====================================');
-      console.log(captureResponse);
-      console.log('====================================');
-      BEnQ(captureResponse, cardnumberORUID, pidDataXml, false);
+        const DevInfo = pidData.DeviceInfo || {};
+        const Resp = pidData.Resp || {};
+
+        if (Resp.errCode !== "0") {
+            Alert.alert(Resp.errInfo || "Fingerprint capture failed");
+            return;
+        }
+
+        const params = DevInfo.additional_info?.Param || [];
+
+        const srNo =
+            params.find(p => p.name?.toLowerCase() === 'srno')?.value ||
+            params.find(p => p.name?.toLowerCase() === 'serialnumber')?.value ||
+            params[0]?.value ||
+            "";
+
+        const cardnumberORUID = {
+            adhaarNumber: '210900202537',
+            indicatorforUID: "0",
+            nationalBankIdentificationNumber: '51545'
+        };
+
+        const captureResponse = {
+            Devicesrno: srNo || "",
+            PidDatatype: "X",
+            Piddata: typeof pidData.Data === "object"
+                ? pidData.Data.content
+                : pidData.Data || "",
+            ci: pidData.Skey?.ci || "",
+            dc: DevInfo.dc || "",
+            dpID: DevInfo.dpId || "",
+            errCode: Resp.errCode ?? "",
+            errInfo: Resp.errInfo || "",
+            fCount: Resp.fCount || "1",
+            fType: Resp.fType || "2",
+            hmac: typeof pidData.Hmac === "object"
+                ? pidData.Hmac.content
+                : pidData.Hmac || "",
+            iCount: Resp.iCount || "0",
+            iType: "0",
+            mc: DevInfo.mc || "",
+            mi: DevInfo.mi || "",
+            nmPoints: Resp.nmPoints || "0",
+            pCount: Resp.pCount || "0",
+            pType: Resp.pType || "0",
+            qScore: Resp.qScore ?? "0",
+            rdsID: DevInfo.rdsId || "",
+            rdsVer: DevInfo.rdsVer || "",
+            sessionKey: typeof pidData.Skey === "object"
+                ? pidData.Skey.content
+                : pidData.Skey || ""
+        };
+
+        console.log("Mapped Response for Finger Auth:", JSON.stringify(captureResponse, null, 2));
+
+        BEnQ(captureResponse, cardnumberORUID, pidDataXml, false);
+
     } catch (error) {
-      Alert.alert("Authentication Failed", error.message);
+        console.error("OnPressEnq Error:", error);
+        Alert.alert("Error", "Fingerprint processing failed.");
     } finally {
-      // setIsLoading(false);
+        // setIsLoading(false);
     }
-  };
+};
 
   const BEnQ = useCallback(async (captureResponse1, cardnumberORUID1, pidDataX, piddata) => {
     setIsLoading(true);

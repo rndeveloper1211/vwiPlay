@@ -42,7 +42,7 @@ import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import AppBar from "./headerAppbar/AppBar";
 import FlotingInput from "./securityPages/FlotingInput";
 import useAxiosHook from "../../utils/network/AxiosClient";
-import { APP_URLS } from "../../utils/network/urls";
+import { APP_URLS, IMAGE_BASE_URL } from "../../utils/network/urls";
 import { decryptData } from "../../utils/encryptionUtils";
 import ImageBottomSheet from "../../components/ImageBottomSheet";
 import { stateData } from "../../utils/stateData";
@@ -52,6 +52,7 @@ import { check, openSettings, RESULTS, PERMISSIONS, request } from 'react-native
 import { ALERT_TYPE, Dialog } from "react-native-alert-notification";
 import { translate } from "../../utils/languageUtils/I18n";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import FastImage from "react-native-fast-image";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SVG CONSTANTS  (outside component → no re-creation on each render)
@@ -564,14 +565,14 @@ const navigateToEditProfile = useCallback(async () => {
       {/* Avatar */}
       <View style={styles.avatarWrap}>
         <View style={[styles.avatarRing, { borderColor: "rgba(255,255,255,0.7)" }]}>
-          <Image
+          <FastImage
             resizeMode="cover"
             source={
               profileImage
                 ? { uri: "data:image/png;base64," + profileImage }
                 : profileData?.Photo
                   ? { uri: `http://${APP_URLS.baseWebUrl}${profileData.Photo}` }
-                  : require("../drawer/assets/bussiness-man.png")
+                  : {uri:`${IMAGE_BASE_URL}bussiness-man.png`}
             }
             style={styles.avatarImg}
           />

@@ -14,6 +14,8 @@ import { hScale, wScale } from "../utils/styles/dimensions";
 import { RootState } from "../reduxUtils/store";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from 'react-redux';
+import FastImage from "react-native-fast-image";
+import { IMAGE_BASE_URL } from "../utils/network/urls";
 
 const ShowLoader = () => {
     const { colorConfig } = useSelector((state: RootState) => state.userInfo);
@@ -59,10 +61,15 @@ const ShowLoader = () => {
                             color={colorConfig?.secondaryColor || "#6C63FF"}
                         />
 
-                        <Image
-                            source={require("../../assets/images/app_logo.png")}
+
+
+                        <FastImage
                             style={styles.logo}
-                            resizeMode="contain"
+                            resizeMode={FastImage.resizeMode.contain}
+                            source={{
+                                priority: FastImage.priority.high,
+                                uri: `${IMAGE_BASE_URL}app_logo.png`
+                            }}
                         />
                     </View>
 

@@ -6,6 +6,8 @@ import { RootState } from '../../../reduxUtils/store';
 import { hScale, wScale } from '../../../utils/styles/dimensions';
 import CheckBalSvg from '../../drawer/svgimgcomponents/CheckBlreporSvg';
 import CheckSvg from '../../drawer/svgimgcomponents/CheckSvg';
+import FastImage from 'react-native-fast-image';
+import { IMAGE_BASE_URL } from '../../../utils/network/urls';
 
 const CmsAcHeader = ({ onPress1, onPress2, Selected, Unselected, tabButtonstyle, tabTextstyle }) => {
   const { colorConfig } = useSelector((State: RootState) => State.userInfo)
@@ -22,7 +24,7 @@ const CmsAcHeader = ({ onPress1, onPress2, Selected, Unselected, tabButtonstyle,
 
   return (
     <View style={[styles.container,{borderColor:colorConfig.secondaryColor}]}>
-      <Image style={styles.toimg} source={require('../../../../assets/images/radiant.png')} resizeMode='contain' />
+      <FastImage style={styles.toimg} source={{uri:IMAGE_BASE_URL+'radiant.png'}} resizeMode='contain' />
 
       <TouchableOpacity
         style={[

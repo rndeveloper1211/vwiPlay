@@ -12,7 +12,7 @@ import UserDelerSvg from '../../drawer/svgimgcomponents/UserDelerSvg';
 import TransferDelerSvg from '../../drawer/svgimgcomponents/TransferDelerSvg';
 import { useFocusEffect } from '@react-navigation/native';
 import { decryptData } from '../../../utils/encryptionUtils';
-import { APP_URLS } from '../../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../../utils/network/urls';
 import useAxiosHook from '../../../utils/network/AxiosClient';
 import { BalanceType } from '../../dashboard/utils';
 import DashboardHeader from '../../dashboard/components/DashboardHeader';
@@ -21,6 +21,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import { hScale, wScale } from '../../../utils/styles/dimensions';
 import { SvgUri } from 'react-native-svg';
 import BackArrow from '../../../utils/svgUtils/BackArrow';
+import FastImage from "react-native-fast-image";
 
 const DealerHome = () => {
   const { colorConfig } = useSelector((state) => state.userInfo);
@@ -135,10 +136,13 @@ useEffect(() => {
                 style={styles.iconButton}
                 onPress={() => navigation.navigate('CmsScreen')}
               >
-             
-             <Image   
-             style={{height:hScale(35),width:wScale(40)}}
-             source={require('../../../../assets/images/radiant.png')}/>
+
+
+             <FastImage
+                          style={{height:hScale(35),width:wScale(40)}}
+
+             source={{uri:`${IMAGE_BASE_URL}radiant.png`}}
+             />
                 <Text style={styles.iconText}>{'Cms'}</Text>
               </TouchableOpacity>
             </View>

@@ -33,13 +33,14 @@ import Privacy from './privacy';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../reduxUtils/store';
 import { colors } from '../../utils/styles/theme';
-import { APP_URLS } from '../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../utils/network/urls';
 import useAxiosHook from '../../utils/network/AxiosClient';
 import { decryptData } from '../../utils/encryptionUtils';
 import Notifications from './Notifications';
 import Entypo from 'react-native-vector-icons/Entypo'; // or another icon set like MaterialIcons
 import LoginReport from './securityPages/LoginReport';
 import BorderLine from '../../components/BorderLine';
+import FastImage from 'react-native-fast-image';
 
 const Drawer = createDrawerNavigator();
 const DrawerNavigation = ({ navigation }) => {
@@ -174,14 +175,14 @@ const DrawerNavigation = ({ navigation }) => {
                       ]}
                     >
                       {adminData && adminData.Photo ? (
-                        <Image
+                        <FastImage
                           source={{
                             uri: `http://${APP_URLS.baseWebUrl}${adminData.Photo}`,
                           }}
                           style={styles.userimg} />
                       ) : (
-                        <Image
-                          source={require('./assets/bussiness-man.png')}
+                        <FastImage
+                          source={{uri:`${IMAGE_BASE_URL}bussiness-man.png`}}
                           style={styles.userimg} />
                       )}
                     </View>

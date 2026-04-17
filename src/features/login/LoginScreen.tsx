@@ -27,13 +27,15 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { translate } from '../../utils/languageUtils/I18n';
 import LinearGradient from 'react-native-linear-gradient';
 import { hScale, wScale } from '../../utils/styles/dimensions';
+import FastImage from 'react-native-fast-image';
+
 import {
   ALERT_TYPE,
   Dialog,
 } from 'react-native-alert-notification';
 import messaging from '@react-native-firebase/messaging';
 
-import { APP_URLS } from '../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../utils/network/urls';
 import {
   setAuthToken,
   setColorConfig,
@@ -584,8 +586,15 @@ const onPressLogin = useCallback(async (otp) => {
     return (
       <LinearGradient colors={[colorConfig.secondaryColor, colorConfig.primaryColor]} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Animated.View style={{ transform: [{ scale: logoAnim }], alignItems: 'center' }}>
-          <Image source={require('../../../assets/images/app_logo.png')}
-            style={{ width: wScale(110), height: wScale(110) }} resizeMode='contain' />
+          {/* <Image source={require('../../../assets/images/app_logo.png')}
+            style={{ width: wScale(110), height: wScale(110) }} resizeMode='contain' /> */}
+
+     <FastImage
+  source={{uri:`${IMAGE_BASE_URL}app_logo.png`}}
+  style={{ width: wScale(110), height: wScale(110) }}
+  resizeMode={FastImage.resizeMode.contain} // ← Yeh dhyan rakhein
+/>
+
         </Animated.View>
         <ActivityIndicator color="#6C63FF" size="large" style={{ marginTop: 24 }} />
       </LinearGradient>
@@ -640,11 +649,18 @@ const onPressLogin = useCallback(async (otp) => {
               colors={[colorConfig.primaryColor, colorConfig.secondaryColor]}
               style={styles.logoGlass}
             >
-              <Image
-                source={require('../../../assets/images/app_logo.png')}
-                style={styles.logoImg}
-                resizeMode='contain'
-              />
+<FastImage
+  style={styles.logoImg}
+  source={{
+    uri: `${IMAGE_BASE_URL}app_logo.png`,
+    priority: FastImage.priority.high,
+    cache: FastImage.cacheControl.immutable,
+  }}
+  resizeMode={FastImage.resizeMode.contain}
+/>
+
+{/* <SmartIcon uri={'https://cdn.jsdelivr.net/gh/rndeveloper1211/vwiImages/app_logo.png'}
+/> */}
             </LinearGradient>
             <Text style={styles.appName}>{APP_URLS.AppName}</Text>
             <Text style={styles.tagline}>{translate("Welcome back")}</Text>

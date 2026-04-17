@@ -12,7 +12,7 @@ import { hScale, wScale } from '../../utils/styles/dimensions';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../reduxUtils/store';
 import useAxiosHook from '../../utils/network/AxiosClient';
-import { APP_URLS } from '../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../utils/network/urls';
 import { sectionData } from './utils';
 import DashboardHeader from './components/DashboardHeader';
 import { useNavigation } from '../../utils/navigation/NavigationService';
@@ -25,6 +25,7 @@ import RecentTrSvg from '../drawer/svgimgcomponents/RecentTrSvg';
 import NewsSlider from '../../components/SliderText';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import QrcodSvg from '../drawer/svgimgcomponents/QrcodSvg';
+import FastImage from 'react-native-fast-image';
 
 // ─── Glow Orbs (same as ReportScreen / AccReportScreen) ──────────────────────
 const GlowOrbs = ({ primaryColor }: { primaryColor: string }) => (
@@ -386,9 +387,16 @@ const HomeScreen = () => {
         <GlassSection
           title={translate('Recharge_Pay_Bill')}
           rightElement={
-            <Image
-              source={require('../../features/drawer/assets/bblogo.png')}
-              style={styles.bblogo}
+            // <Image
+            //   source={require('../../features/drawer/assets/bblogo.png')}
+            //   style={styles.bblogo}
+            // />
+
+            <FastImage
+            source={{
+              priority:FastImage.priority.high,
+              uri:`${IMAGE_BASE_URL}bblogo.png`}}
+            style={styles.bblogo}
             />
           }
         >

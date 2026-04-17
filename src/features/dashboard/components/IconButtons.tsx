@@ -21,6 +21,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { APP_URLS } from "../../../utils/network/urls";
 import useAxiosHook from "../../../utils/network/AxiosClient";
 import { translate } from "../../../utils/languageUtils/I18n";
+import FastImage from "react-native-fast-image";
 
 // ─── Constants ───────────────────────────────────────────────
 const MAX_ITEMS = 4;
@@ -73,7 +74,7 @@ const SmartIcon = memo(
 
     // ✅ Pehle PNG try karo (fast + cached)
     return (
-      <Image
+      <FastImage
         source={{ uri: svgToPngUrl(uri) }}
         style={styles.iconImage}
         resizeMode="contain"

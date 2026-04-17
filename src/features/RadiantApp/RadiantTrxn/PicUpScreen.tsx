@@ -23,7 +23,7 @@ import FlotingInput from '../../drawer/securityPages/FlotingInput';
 import Calendarsvg from '../../drawer/svgimgcomponents/Calendarsvg';
 import OnelineDropdownSvg from '../../drawer/svgimgcomponents/simpledropdown';
 import CheckSvg from '../../drawer/svgimgcomponents/CheckSvg';
-import { APP_URLS } from '../../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../../utils/network/urls';
 import useAxiosHook from '../../../utils/network/AxiosClient';
 import ShowLoader from '../../../components/ShowLoder';
 import { useLocationHook } from '../../../hooks/useLocationHook';
@@ -40,6 +40,7 @@ import uuid from 'react-native-uuid';
 import { log } from 'console';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translate } from '../../../utils/languageUtils/I18n';
+import FastImage from 'react-native-fast-image';
 const PicUpScreen = () => {
   const { colorConfig, Loc_Data, cmsVerify, rctype, rcPrePayAnomut, isPartial, currentPartialAmount, totalPartialAmount } = useSelector((state: RootState) => state.userInfo);
   const color1 = `${colorConfig.secondaryColor}20`;
@@ -185,14 +186,29 @@ const PicUpScreen = () => {
           />
           <View style={[styles.righticon2]}>
             {item.key !== "Online" ? (
-              <Image
-                source={item.path}
+              // <Image
+              //   source={item.path}
+              //   style={{
+              //     width: wScale(90),
+              //     height: "100%",
+              //     resizeMode: "contain",
+              //     marginBottom: -2,
+              //   }}
+              // />
+
+              <FastImage
                 style={{
                   width: wScale(90),
                   height: "100%",
-                  resizeMode: "contain",
                   marginBottom: -2,
                 }}
+                source={{
+                  // Yahan URL dynamic banaya gaya hai
+                  uri: `${IMAGE_BASE_URL}${item.key === 'Coins' ? 'coins' : item.key}R.jpg`,
+                  priority: FastImage.priority.normal,
+                  cache: FastImage.cacheControl.immutable, // Cache performance ke liye
+                }}
+                resizeMode={FastImage.resizeMode.contain}
               />
             ) : (
               <TouchableOpacity onPress={() => getqr()}
@@ -1161,7 +1177,7 @@ const PicUpScreen = () => {
   return (
     <>
       {isScan ? (
-null      ) : (
+        null) : (
         <View style={styles.main}>
 
 
@@ -1286,7 +1302,7 @@ null      ) : (
             )}
 
             <LinearGradient
-              colors={[colorConfig.primaryColor,colorConfig.secondaryColor  ]}
+              colors={[colorConfig.primaryColor, colorConfig.secondaryColor]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.summaryCard}
@@ -1308,7 +1324,7 @@ null      ) : (
 
                 <View style={styles.summaryItem}>
                   <Text style={styles.summaryLabel}>{translate('Total Amount')}</Text>
-                  <Text style={[styles.summaryValue,styles.summaryValueHighlight]}>{finalAmount}</Text>
+                  <Text style={[styles.summaryValue, styles.summaryValueHighlight]}>{finalAmount}</Text>
                 </View>
               </View>
             </LinearGradient>
@@ -1470,7 +1486,7 @@ null      ) : (
                 </View>
               )}
               <BottomSheet
-              animationType='none'
+                animationType='none'
                 isVisible={remarkVisible}
                 onBackdropPress={() => setRemarkVisible(false)}
               >
@@ -1500,7 +1516,7 @@ null      ) : (
                 </View>
               </BottomSheet>
               <BottomSheet
-              animationType='none'
+                animationType='none'
                 isVisible={clientCodeModalVisible}
                 onBackdropPress={() => setClientCodeModal(false)}
               >
@@ -1729,7 +1745,7 @@ null      ) : (
 
 
               <BottomSheet
-              animationType='none'
+                animationType='none'
                 onBackdropPress={() => setShowCalender(false)}
                 isVisible={showCalender}
               >
@@ -1999,7 +2015,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     // backgroundColor:'rgba(0, 0, 0, 0.2)', 
     paddingVertical: hScale(3),
-        borderRadius: 8,
+    borderRadius: 8,
 
   },
 
@@ -2027,7 +2043,7 @@ const styles = StyleSheet.create({
 
   summaryValueHighlight: {
     color: '#FFD700',
-   
+
   },
 
 

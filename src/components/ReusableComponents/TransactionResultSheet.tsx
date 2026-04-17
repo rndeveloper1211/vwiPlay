@@ -19,6 +19,7 @@ import { commonStyles } from "../../utils/styles/commonStyles";
 import { shareSlipImage } from "../../utils/shareSlipImage ";
 import ShareGoback from "../ShareGoback";
 import { useNavigation } from "../../utils/navigation/NavigationService";
+import { IMAGE_BASE_URL } from "../../utils/network/urls";
 
 
 type Row = {
@@ -82,7 +83,10 @@ onGoBack
 
 
               <ImageBackground
-                source={require("../../../assets/images/HeaderBg.png")}
+                source={{uri:`${IMAGE_BASE_URL}HeaderBg.png`,
+                  
+
+                }}
                 style={styles.imgstyle}
               >
                 <View style={styles.greenTop}>

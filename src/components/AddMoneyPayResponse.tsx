@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ImageBackground, BackHandler, ToastAndroid } from 'react-native';
-import { APP_URLS } from '../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../utils/network/urls';
 import useAxiosHook from '../utils/network/AxiosClient';
 import { hScale, wScale } from '../utils/styles/dimensions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -173,7 +173,7 @@ const onPressGoBack = () => {
           }]} />
 
 
-          <ImageBackground source={require('../../assets/images/HeaderBg.png')}
+          <ImageBackground source={{uri:`${IMAGE_BASE_URL}HeaderBg.png`}}
             style={styles.imgstyle}
             resizeMode="cover"
           >

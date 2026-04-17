@@ -9,9 +9,10 @@ import { RootState } from '../../../reduxUtils/store';
 import DynamicButton from '../../drawer/button/DynamicButton';
 import BackSvg from '../../drawer/svgimgcomponents/BackSvg';
 import { useNavigation } from '../../../utils/navigation/NavigationService';
-import { APP_URLS } from '../../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../../utils/network/urls';
 import useAxiosHook from '../../../utils/network/AxiosClient';
 import ShowLoader from '../../../components/ShowLoder';
+import FastImage from "react-native-fast-image";
 
 const AboutCms = () => {
     const { colorConfig } = useSelector((state: RootState) => state.userInfo);
@@ -73,7 +74,12 @@ const AboutCms = () => {
 
         <ScrollView style={{}}>
             <View style={[styles.topcontainer,]}>
-                <Image source={require('../../../../assets/images/radiant.png')}
+                <FastImage
+                
+                // source={
+                //     require('../../../../assets/images/radiant.png')
+                // }
+source={{uri:IMAGE_BASE_URL+'radiant.png'}}
                     style={styles.imgstyle}
                     resizeMode="contain" />
                 <View style={styles.column}>
@@ -107,7 +113,9 @@ const AboutCms = () => {
                     </View>
                     <View style={styles.matimg}>
 
-                        <Image source={require('../../../../assets/images/map.png')}
+                        <FastImage
+                        
+                        source={{uri :IMAGE_BASE_URL+ 'map.png'}}
                             style={styles.mapstyle}
                             resizeMode="contain" />
                     </View>

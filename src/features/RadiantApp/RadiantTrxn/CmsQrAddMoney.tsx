@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../reduxUtils/store';
 import { hScale, wScale } from '../../../utils/styles/dimensions';
 import useAxiosHook from '../../../utils/network/AxiosClient';
-import { APP_URLS } from '../../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../../utils/network/urls';
 import { decryptData } from '../../../utils/encryptionUtils';
 import { useFocusEffect } from '@react-navigation/native';
 import ShowLoaderBtn from '../../../components/ShowLoaderBtn';
@@ -89,7 +89,7 @@ export default function CmsQrAddMoney() {
   };
 
   return (
-    <ImageBackground source={require('../../../../assets/images/CmsAddMoneyBg.jpeg')}
+    <ImageBackground source={{ uri : IMAGE_BASE_URL +'CmsAddMoneyBg.jpeg'}}
       imageStyle={styles.borderRadius}
     >
       <View

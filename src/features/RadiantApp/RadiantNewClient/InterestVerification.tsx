@@ -7,6 +7,8 @@ import { RootState } from '../../../reduxUtils/store';
 import { useSelector } from 'react-redux';
 import { useNavigation } from '../../../utils/navigation/NavigationService';
 import { FontFamily } from '../../../utils/styles/theme';
+import FastImage from "react-native-fast-image";
+import { IMAGE_BASE_URL } from "../../../utils/network/urls";
 
 const InterestVerification = () => {
     const { colorConfig } = useSelector((state: RootState) => state.userInfo);
@@ -21,8 +23,9 @@ const InterestVerification = () => {
             </Text>
             <Text style={styles.subHeading}>{translate("CMS_SERVICES")}</Text>
 
-            <Image
-                source={require('../../../../assets/images/Radiant2.jpg')}
+            <FastImage
+                // source={require('../../../../assets/images/Radiant2.jpg')}
+                source={{uri :IMAGE_BASE_URL + 'Radiant2.jpg'}}
                 style={styles.logo}
                 resizeMode={'cover'}
             />

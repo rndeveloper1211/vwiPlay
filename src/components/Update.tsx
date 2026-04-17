@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Animated, TouchableOpacity,Text,View, Image, Easing, Linking} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { wScale } from "../utils/styles/dimensions";
-import { APP_URLS } from "../utils/network/urls";
+import { APP_URLS, IMAGE_BASE_URL } from "../utils/network/urls";
 
 const Update =(isVer)=>{
     const [fadeAnim] = useState(new Animated.Value(0));
@@ -110,7 +110,7 @@ const Update =(isVer)=>{
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-          <Image source={require('../../../assets/images/app_logo.png')}
+          <Image source={{uri:IMAGE_BASE_URL+ 'app_logo.png'}}
             style={[styles.imgstyle, {
               width: wScale(180),
               height: wScale(180),

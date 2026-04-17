@@ -117,13 +117,13 @@ const CmsPrePay = ({ route }) => {
         // 2. URL construct karo (Ensure values are defined)
         const url = `${APP_URLS.CashPickupRemainBalNEW}?Amount=${amount || 0}&RCEID=${rceID || ''}&Shopid=${shopId || ''}`;
         
-        console.log("🚀 API Requesting:", url);
+        console.log("🚀 API Requesting✅✅✅✅✅✅✅:", url);
 
         // 3. API call (POST request)
         const response = await post({ url });
 
         // 4. Console log for debugging
-        console.log("✅ API Success Response:", response);
+        console.log("✅ API Success Response:✅✅✅✅✅✅✅", response);
 
         // 5. Agar response null ya undefined hai toh error throw karo
         if (!response) {
@@ -193,7 +193,7 @@ const CmsPrePay = ({ route }) => {
 
     const handleAddMoney = () => {
         if (!amount) {
-            alert("Please enter amount");
+            // alert.("Please enter amount");
             return;
         }
         dispatch(setCmsAddMFrom('CmsPrePay'))

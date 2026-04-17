@@ -202,58 +202,59 @@ const BalanceCheck = ({ }) => {
             console.log("Firestore Save Error:", error);
         }
     };
-    const openFace = () => {
+const openFace = () => {
+    openFaceAuth(userId)
+        .then(async (res) => {
+            setIsLoading(true);
+            setisFacialTan(true);
 
-        openFaceAuth(userId)
-            .then(async (res) => {
-                setIsLoading(true);
+            console.log("Face Auth Response:", JSON.stringify(res, null, 2));
 
-                setisFacialTan(true);
-
-                // 🔥 Full response console
-                console.log("Face Auth Response:", res);
-
-                // 🔥 Cloud / Firestore save
-                //  await saveFaceResponse(res);
-
-                // 🔴 Face cancel / camera close
-                if (res?.errorCode === 892) {
-
-                    setIsLoading(false);
-                    console.log("Face authentication cancelled");
-
-                    return;
-                }
-
-
-
-                // 🟢 Success
-                if (res?.piddataJsonString) {
-
-                    console.log("Face Data Received Successfully");
-
-                    setIsLoading(true);
-
-                    OnPressEnq2(res);
-
-                }
-
-            })
-            .catch(async (error) => {
-
-                console.error("Face Authentication Error:", error);
-
-                //   await saveFaceResponse({
-                //     type: "FACE_ERROR",
-                //     error: JSON.stringify(error)
-                //   });
-
+            if (res?.errorCode === 892) {
                 setIsLoading(false);
+                Alert.alert("Cancelled", "Face authentication cancelled by user");
+                return;
+            }
 
-                Alert.alert("Face authentication failed");
+            // ✅ dono key check
+            if (res?.piddataJsonString || res?.pidDataJson) {
+                console.log("Face Data Received Successfully");
 
-            });
-    };
+                // Alert.alert(
+                //     "✅ Face Auth Response",
+                //     JSON.stringify(res, null, 2),
+                //     [
+                //         {
+                //             text: "Proceed",
+                //             onPress: () => {
+                //                 setIsLoading(true);
+                //                 OnPressEnq2(res);
+                //             },
+                //         },
+                //         {
+                //             text: "Cancel",
+                //             style: "cancel",
+                //             onPress: () => setIsLoading(false),
+                //         },
+                //     ]
+                // );
+
+                 setIsLoading(true);
+                                OnPressEnq2(res);
+            } else {
+                setIsLoading(false);
+                Alert.alert("Error", "No PID data received from Face Auth");
+            }
+        })
+        .catch(async (error) => {
+            console.error("Face Authentication Error:", error);
+            setIsLoading(false);
+            Alert.alert(
+                "❌ Face Auth Failed",
+                error?.message || JSON.stringify(error)
+            );
+        });
+};
     const saveResponseToFile = async (response) => {
         const path = RNFS.DownloadDirectoryPath + '/response-face.json'; // File path
         try {
@@ -321,98 +322,90 @@ const BalanceCheck = ({ }) => {
     //         console.error("BEnQ Call Error:", error);
     //     }
     // };
-    const OnPressEnq2 = async (fingerprintData) => {
-        try {
+const OnPressEnq2 = async (fingerprintData) => {
+    try {
 
-            const parsedJson =
-                typeof fingerprintData?.piddataJsonString === "string"
-                    ? JSON.parse(fingerprintData.piddataJsonString)
-                    : fingerprintData?.piddataJsonString;
+        const raw =
+            fingerprintData?.piddataJsonString ||
+            fingerprintData?.pidDataJson ||
+            fingerprintData;
 
-            const pidData = parsedJson?.PidData;
-            if (!pidData) throw new Error("Invalid PID Data");
+        const parsedJson =
+            typeof raw === "string"
+                ? JSON.parse(raw)
+                : raw;
 
-            const DevInfo = pidData.DeviceInfo || {};
-            const Resp = pidData.Resp || {};
+        const pidData = parsedJson?.PidData;
+        if (!pidData) throw new Error("Invalid PID Data");
 
+        const DevInfo = pidData.DeviceInfo || {};
+        const Resp = pidData.Resp || {};
 
+        const cardnumberORUID = {
+            adhaarNumber: aadharNumber,
+            indicatorforUID: "0",
+            nationalBankIdentificationNumber: bankid
+        };
 
-            const cardnumberORUID = {
-                adhaarNumber: aadharNumber,
-                indicatorforUID: "0",
-                nationalBankIdentificationNumber: bankid
-            };
+        const captureResponse = {
+            Devicesrno:
+                DevInfo?.additional_info?.Param?.[0]?.value ||
+                DevInfo?.dc ||
+                "",
+            PidDatatype: "X",
+            Piddata: typeof pidData.Data === "object"
+                ? pidData.Data.content
+                : pidData.Data || "",
+            ci: pidData.Skey?.ci || "",
+            dc: DevInfo.dc || "",
+            dpID: DevInfo.dpId || "",
+            errCode: Resp.errCode ?? "",
+            errInfo: Resp.errInfo || "",
+            fCount: Resp.fCount || "0",
+            fType: Resp.fType || "0",
+            hmac: typeof pidData.Hmac === "object"
+                ? pidData.Hmac.content
+                : pidData.Hmac || "",
+            iCount: Resp.iCount || "0",
+            iType: Resp.iType || "0",
+            mc: DevInfo.mc || "",
+            mi: DevInfo.mi || "",
+            nmPoints: Resp.nmPoints || "0",
+            pCount: Resp.pCount || "0",
+            pType: Resp.pType || "0",
+            qScore: Resp.qScore ?? "-1",
+            rdsID: DevInfo.rdsId || "",
+            rdsVer: DevInfo.rdsVer || "",
+            sessionKey: typeof pidData.Skey === "object"
+                ? pidData.Skey.content
+                : pidData.Skey || ""
+        };
 
-            const captureResponse = {
+        console.log("Mapped Response for Face Auth:", JSON.stringify(captureResponse, null, 2));
 
-                Devicesrno:
-                    DevInfo?.additional_info?.Param?.[0]?.value ||
-                    DevInfo?.dc ||
-                    "",
-
-                PidDatatype: "X",
-
-                Piddata:
-                    typeof pidData.Data === "object"
-                        ? pidData.Data.content
-                        : pidData.Data || "",
-
-                ci: pidData.Skey?.ci || "",
-
-                dc: DevInfo.dc || "",
-                dpID: DevInfo.dpId || "",
-
-                errCode: Resp.errCode ?? "",
-                errInfo: Resp.errInfo || "",
-
-                fCount: Resp.fCount || "0",
-                fType: Resp.fType || "0",
-
-                hmac:
-                    typeof pidData.Hmac === "object"
-                        ? pidData.Hmac.content
-                        : pidData.Hmac || "",
-
-                iCount: Resp.iCount || "0",
-                iType: Resp.iType || "0",
-
-                mc: DevInfo.mc || "",
-                mi: DevInfo.mi || "",
-
-                nmPoints: Resp.nmPoints || "0",
-
-                pCount: Resp.pCount || "0",
-                pType: Resp.pType || "0",
-
-                qScore: Resp.qScore || "-1",
-
-                rdsID: DevInfo.rdsId || "",
-                rdsVer: DevInfo.rdsVer || "",
-
-                sessionKey:
-                    typeof pidData.Skey === "object"
-                        ? pidData.Skey.content
-                        : pidData.Skey || ""
-            };
-
-            console.log(
-                "Mapped Response for Face Auth:",
-                JSON.stringify(captureResponse, null, 2)
-            );
-
-            BEnQ(captureResponse, cardnumberORUID, "", true);
-
-        } catch (error) {
-
-            console.error("OnPressEnq2 Error:", error);
-            Alert.alert("Error", "Biometric processing failed.");
-
-        } finally {
-
-            // setIsLoading(false);
-
-        }
-    };
+        // ✅ Dono JSON alert mein
+        // Alert.alert(
+        //     "Face Auth Debug",
+        //     `📥 RAW INPUT:\n${JSON.stringify(fingerprintData, null, 2)}\n\n📤 MAPPED captureResponse:\n${JSON.stringify(captureResponse, null, 2)}`,
+        //     [
+        //         {
+        //             text: "Proceed",
+        //             onPress: () => BEnQ(captureResponse, cardnumberORUID, "", true),
+        //         },
+        //         {
+        //             text: "Cancel",
+        //             style: "cancel",
+        //         },
+        //     ]
+        // );
+BEnQ(captureResponse, cardnumberORUID, "", true);
+    } catch (error) {
+        console.error("OnPressEnq2 Error:", error);
+        Alert.alert("Error", "Biometric processing failed.");
+    } finally {
+        // setIsLoading(false);
+    }
+};
 
 
     // const OnPressEnq = async (fingerprintDataString, pidDataXx) => {
@@ -526,81 +519,105 @@ const BalanceCheck = ({ }) => {
 
     //   }
     // };
+// ✅ Hardcoded finger data — test ke liye
+const testFingerData = {"errInfo": "", "errorCode": "0", "message": "FingerPrint Scanned Successfully", "piddataJsonString": "{\"PidData\":{\"Hmac\":\"tOGatm3jbAeEAVLldU4nYK8X9b8OfEsB6T8p+WjPuur1z\\/Y3dHFQPNu5nYEUESLb\",\"Resp\":{\"qScore\":\"83\",\"errInfo\":\"Success\",\"fType\":\"2\",\"errCode\":\"0\",\"fCount\":\"1\",\"nmPoints\":\"46\"},\"DeviceInfo\":{\"additional_info\":{\"Param\":[{\"name\":\"srno\",\"value\":\"9585173\"}]},\"mc\":\"MIIEADCCAuig\",\"dpId\":\"MANTRA.MSIPL\",\"rdsId\":\"RENESAS.MANTRA.001\",\"mi\":\"MFS110\",\"rdsVer\":\"1.4.1\",\"dc\":\"2d286ad0-891e-4ea4-8cb5-942b4daeb3ce\"},\"Data\":{\"content\":\"MjAyNi0wMy0yOFQxNzoxNzo1Nw==\",\"type\":\"X\"},\"Skey\":{\"content\":\"wK\\/u8+pKqF7Pyx==\",\"ci\":\"20280813\"}}}", "piddataXML": "<PidData></PidData>", "rdservicePackage": "FINGERPRINT_SCANNER", "status": 1};
+
+// ✅ Hardcoded face data — test ke liye  
+const testFaceData = {"errInfo": "", "errorCode": "0", "message": "FingerPrint Scanned Successfully", "piddataJsonString": "{\"PidData\":{\"Hmac\":\"tFeQqiEMiagUFJpg8TqWqTQfgFzx6PVDM2p8YuU+0kkA3nssY4APdtkTb9iC31\\/a\",\"Resp\":{\"qScore\":\"-1\",\"fType\":\"2\",\"errCode\":\"0\",\"iCount\":\"0\",\"pType\":\"3\",\"fCount\":\"0\",\"nmPoints\":\"0\",\"iType\":\"0\",\"pCount\":\"1\"},\"DeviceInfo\":{\"Additional_Info\":\"\",\"mc\":\"MIIDrDCC\",\"dpId\":\"UIDAI.UIDAI\",\"rdsId\":\"UIDAI.ONLINE.001\",\"mi\":\"UIDAI.ONLINE\",\"rdsVer\":\"1.0.0\",\"dc\":\"6a34b4aa-2446-4e3f-864a-7ac49147afe4\"},\"Data\":{\"content\":\"MjAyNi0wMy0xNFQxNzowNjowOA==\",\"type\":\"X\"},\"Skey\":{\"content\":\"cQsRnfts\\/n8IOx7==\",\"ci\":\"20280813\"}}}"};
 
 
-    const OnPressEnq = async (fingerprintDataString, pidDataXml) => {
-        try {
+// useEffect(() => {
+//     // Finger test
+//     OnPressEnq(testFingerData, testFingerData.piddataXML);
+    
+//     // Face test
+//     // OnPressEnq2(testFaceData);
+// }, []);
 
-            const parsedJson = typeof fingerprintDataString === 'string'
-                ? JSON.parse(fingerprintDataString)
-                : fingerprintDataString;
+const OnPressEnq = async (fingerprintDataString, pidDataXml) => {
+    try {
 
-            const pidData = parsedJson?.PidData;
-            if (!pidData) throw new Error("Invalid PID Data");
+        // ✅ piddataJsonString ke andar PidData hai
+        const raw = fingerprintDataString?.piddataJsonString || fingerprintDataString;
 
-            const DevInfo = pidData.DeviceInfo || {};
-            const Resp = pidData.Resp || {};
+        const parsedJson = typeof raw === 'string'
+            ? JSON.parse(raw)
+            : raw;
 
-            if (Resp.errCode !== "0") {
-                Alert.alert(Resp.errInfo || "Fingerprint capture failed");
-                return;
-            }
+        const pidData = parsedJson?.PidData;
+        if (!pidData) throw new Error("Invalid PID Data");
 
-            const params = DevInfo.additional_info?.Param || [];
+        const DevInfo = pidData.DeviceInfo || {};
+        const Resp = pidData.Resp || {};
 
-            const srNo =
-                params.find(p => p.name?.toLowerCase() === 'srno')?.value ||
-                params.find(p => p.name?.toLowerCase() === 'serialnumber')?.value ||
-                params[0]?.value ||
-                "";
-
-            const cardnumberORUID = {
-                adhaarNumber: aadharNumber,
-                indicatorforUID: "0",
-                nationalBankIdentificationNumber: bankid
-            };
-
-            const captureResponse = {
-                Devicesrno: srNo || "",
-                PidDatatype: "X",
-                Piddata: pidData.Data?.content || pidData.Data || "",
-                ci: pidData.Skey?.ci || "",
-                dc: DevInfo.dc || "",
-                dpID: DevInfo.dpId || "",
-                errCode: Resp.errCode ?? "",
-                errInfo: Resp.errInfo || "",
-                fCount: Resp.fCount || "1",
-                fType: Resp.fType || "2",
-                hmac: pidData.Hmac?.content || pidData.Hmac || "",
-                iCount: Resp.iCount || "0",
-                iType: "0",
-                mc: DevInfo.mc || "",
-                mi: DevInfo.mi || "",
-                nmPoints: Resp.nmPoints || "0",
-                pCount: Resp.pCount || "0",
-                pType: Resp.pType || "0",
-                qScore: Resp.qScore || "0",
-                rdsID: DevInfo.rdsId || "",
-                rdsVer: DevInfo.rdsVer || "",
-                sessionKey: pidData.Skey?.content || pidData.Skey || ""
-            };
-
-            BEnQ(captureResponse, cardnumberORUID, pidDataXml, false);
-
-        } catch (error) {
-            console.error("OnPressEnq Error:", error);
-            Alert.alert("Error", "Fingerprint processing failed.");
-        } finally {
-            //   setIsLoading(false);
+        if (Resp.errCode !== "0") {
+            Alert.alert(Resp.errInfo || "Fingerprint capture failed");
+            return;
         }
-    };
+
+        const params = DevInfo.additional_info?.Param || [];
+
+        const srNo =
+            params.find(p => p.name?.toLowerCase() === 'srno')?.value ||
+            params.find(p => p.name?.toLowerCase() === 'serialnumber')?.value ||
+            params[0]?.value ||
+            "";
+
+        const cardnumberORUID = {
+            adhaarNumber: aadharNumber,
+            indicatorforUID: "0",
+            nationalBankIdentificationNumber: bankid
+        };
+
+        const captureResponse = {
+            Devicesrno: srNo || "",
+            PidDatatype: "X",
+            Piddata: typeof pidData.Data === "object"
+                ? pidData.Data.content
+                : pidData.Data || "",
+            ci: pidData.Skey?.ci || "",
+            dc: DevInfo.dc || "",
+            dpID: DevInfo.dpId || "",
+            errCode: Resp.errCode ?? "",
+            errInfo: Resp.errInfo || "",
+            fCount: Resp.fCount || "1",
+            fType: Resp.fType || "2",
+            hmac: typeof pidData.Hmac === "object"
+                ? pidData.Hmac.content
+                : pidData.Hmac || "",
+            iCount: Resp.iCount || "0",
+            iType: "0",
+            mc: DevInfo.mc || "",
+            mi: DevInfo.mi || "",
+            nmPoints: Resp.nmPoints || "0",
+            pCount: Resp.pCount || "0",
+            pType: Resp.pType || "0",
+            qScore: Resp.qScore ?? "0",
+            rdsID: DevInfo.rdsId || "",
+            rdsVer: DevInfo.rdsVer || "",
+            sessionKey: typeof pidData.Skey === "object"
+                ? pidData.Skey.content
+                : pidData.Skey || ""
+        };
+
+        console.log("Mapped Response for Finger Auth:", JSON.stringify(captureResponse, null, 2));
+
+        BEnQ(captureResponse, cardnumberORUID, pidDataXml, false);
+
+    } catch (error) {
+        console.error("OnPressEnq Error:", error);
+        Alert.alert("Error", "Fingerprint processing failed.");
+    } finally {
+        // setIsLoading(false);
+    }
+};
 
 
-    const BEnQ = useCallback(async (captureResponse1, cardnumberORUID1, pidDataX, isface) => {
+const BEnQ = useCallback(async (captureResponse1, cardnumberORUID1, pidDataX, isface) => {
         try {
             setIsLoading(true);
-            const Model = await getMobileDeviceId();
-            const address = latitude; // Make sure latitude is defined in the scope
+            const Model = getMobileDeviceId();
+            const address = latitude;
             const jdata = {
                 capxml: pidDataX,
                 captureResponse: captureResponse1,
@@ -608,19 +625,19 @@ const BalanceCheck = ({ }) => {
                 languageCode: 'en',
                 latitude: latitude,
                 longitude: longitude,
-                mobileNumber: mobileNumber, // Ensure mobileNumber is defined
-                merchantTranId: userId, // Ensure userId is defined
+                mobileNumber: mobileNumber,
+                merchantTranId: userId,
                 merchantTransactionId: userId,
                 paymentType: 'B',
                 otpnum: '',
                 requestRemarks: 'TN3000CA06532',
                 subMerchantId: 'A2zsuvidhaa',
-                timestamp: formattedDate, // Ensure formattedDate is defined
+                timestamp: formattedDate,
                 transactionType: 'BE',
-                name: consumerName, // Ensure consumerName is defined
+                name: consumerName,
                 Address: address,
                 transactionAmount: '',
-                isFacialTan: isFacialTan // Ensure isFace is defined
+                isFacialTan: isFacialTan
             };
 
             const headers = {
@@ -630,20 +647,24 @@ const BalanceCheck = ({ }) => {
                 "Accept": "application/json",
             };
 
-            console.log('headers', headers);
             const data = JSON.stringify(jdata);
             console.log('Request Data:', data);
 
             const response = await post({
                 url: activeAepsLine ? 'AEPS/api/Nifi/app/AEPS/balanceEnquiry' : 'AEPS/api/app/AEPS/balanceEnquiry',
                 data: data,
-                config: {
-                    headers,
-                },
+                config: { headers },
             });
 
+            console.log('Full Response:', JSON.stringify(response, null, 2));
+
+            // Alert.alert(
+            //     "API Response",
+            //     JSON.stringify(response, null, 2),
+            //     [{ text: "OK" }]
+            // );
+
             const { RESULT, ADDINFO } = response;
-            setIsLoading(false);
             setFingerprintData(720);
 
             if (RESULT && RESULT.toString() === '0') {
@@ -653,7 +674,7 @@ const BalanceCheck = ({ }) => {
                     ministate: {
                         bankName,
                         Name: consumerName,
-                        Aadhar: aadharNumber, // Ensure aadharNumber is defined
+                        Aadhar: aadharNumber,
                         mobileNumber: mobileNumber,
                         RequestTransactionTime: RequestTransactionTime,
                         BalanceAmount: BalanceAmount,
@@ -663,35 +684,26 @@ const BalanceCheck = ({ }) => {
                     mode: 'BAL CHECK'
                 });
 
-                // Optionally show an alert
-                // Alert.alert('Transaction Status', `Transaction Status: ${TransactionStatus}\nBank RRN: ${BankRrn}\nBalance Amount: ${BalanceAmount}\nRequest Transaction Time: ${RequestTransactionTime}`);
-            } else if (RESULT.toString() === '1') {
-
-
+            } else if (RESULT == '1') {
                 if (isFacialTan) {
-                    Dialog.show({
-                        type: ALERT_TYPE.DANGER,
-                        title: 'Note....',
-                        textBody: ADDINFO == null ? 'Transaction Failed ' : ADDINFO,
-                        closeOnOverlayTap: false,
-                        button: 'OK',
-                        onPressButton: () => {
-                            Dialog.hide();
-
-                        },
-                    });
+                   Alert.alert(
+    'Note....',
+    ADDINFO == null ? 'Transaction Failed' : ADDINFO,
+    [{ text: 'OK' }]
+);
                 } else {
                     Alert.alert('Message', ADDINFO == null ? 'Transaction Failed ' : ADDINFO);
-
                 }
             }
 
+            setIsLoading(false);
+
         } catch (error) {
-            console.error('Error during balance enquiry:', error);
-            setIsLoading(false); // Ensure loading state is reset on error
+            console.error('BEnQ Error:', error);
+            Alert.alert('Error', 'Error during balance enquiry: ' + error);
+            setIsLoading(false);
         }
-    }, [latitude, longitude, mobileNumber, userId, formattedDate, consumerName, navigation,
-        isFace]);
+    }, [latitude, longitude, mobileNumber, userId, formattedDate, consumerName, navigation, isFace]);
 
 
 
@@ -864,6 +876,7 @@ const BalanceCheck = ({ }) => {
                 else if (res.status === 1 || res.errorCode == 0) {
 
                     //  await logToFirebase("fingerprint_success", res);
+                    setIsLoading(true);
 
                     OnPressEnq(res.piddataJsonString, res.piddataXML);
 

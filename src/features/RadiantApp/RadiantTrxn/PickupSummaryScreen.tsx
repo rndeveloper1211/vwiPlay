@@ -1,4 +1,4 @@
-import { translate } from "../../../utils/languageUtils/I18n";
+import { translate } from '../../../utils/languageUtils/I18n';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Image, Dimensions,
@@ -14,18 +14,19 @@ import CheckSvg from '../../drawer/svgimgcomponents/CheckSvg';
 import ShowLoader from '../../../components/ShowLoder';
 
 import { hScale, wScale } from '../../../utils/styles/dimensions';
-import { APP_URLS } from '../../../utils/network/urls';
+import { APP_URLS, IMAGE_BASE_URL } from '../../../utils/network/urls';
 import useAxiosHook from '../../../utils/network/AxiosClient';
 import { useNavigation } from '../../../utils/navigation/NavigationService';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../reduxUtils/store';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ViewShot, { captureRef } from 'react-native-view-shot';
-import Share from "react-native-share";
+import Share from 'react-native-share';
 import CmsSuccessModal from '../../../components/CmsSuccessModal';
 import { playSound } from '../../dashboard/components/Sounds';
 import NoDatafound from '../../drawer/svgimgcomponents/Nodatafound';
 import { setPartialAmounts } from '../../../reduxUtils/store/userInfoSlice';
+import FastImage from 'react-native-fast-image';
 
 
 const initialLayout = { width: Dimensions.get('window').width };
@@ -68,11 +69,11 @@ const PickupSummaryScreen = ({ route }) => {
     if (CodeId) {
       getPDFData(CodeId);
     } else {
-      alert("❌ TXN ID is missing");
+      alert('❌ TXN ID is missing');
       setIsLoading(false);
     }
 
-    playSound('Success', true)
+    playSound('Success', true);
   }, [CodeId, message]);
 
   const getPDFData = async (id) => {
@@ -99,7 +100,7 @@ const PickupSummaryScreen = ({ route }) => {
 
       }
     } catch (error) {
-      console.error("❌ Error fetching PDF:", error.message);
+      console.error('❌ Error fetching PDF:', error.message);
       // Error me bhi data aur routes empty
       setData([]);
       setRoutes([]);
@@ -110,109 +111,109 @@ const PickupSummaryScreen = ({ route }) => {
 
   const defaultContent = [
     {
-      Amountinwords: "Eight Thousand One Hundred and Fifty Rupees Only",
-      pis_hcl_no: "775457",
-      hcl_no: "X8862078",
-      transId: "153467126",
-      trans_date: "2025-08-11 11:34",
-      cust_name: "FASHNEAR TECHNOLOGIES PVT LTD",
-      point_name: "OLPURA GHOGHA BiharOLPURA GHOGHA BiharOLPURA GHOGHA Bihar",
-      shop_id: "RCE-RSC00893",
-      ceId: "RCE209",
-      s500: "3",
-      s200: "18",
-      s100: "25",
-      s50: "10",
-      s20: "2",
-      s10: "1",
-      s5: "0",
-      coins: "0",
-      pickup_amount: "8150",
-      Name: "MITHILESH KUMAR",
-      Mobile: "7366007448",
-      PhotoName: "https://vastbazaar.com/Uploads/4726ac2c-d757-42c7-bb1c-39dfc176ceca139Photomitlesh pic.jpg",
-      contact_peroson: "Anile Kumar",
-      contact_Mobile: "+91 8955664610",
-      Email: "N/A"
+      Amountinwords: 'Eight Thousand One Hundred and Fifty Rupees Only',
+      pis_hcl_no: '775457',
+      hcl_no: 'X8862078',
+      transId: '153467126',
+      trans_date: '2025-08-11 11:34',
+      cust_name: 'FASHNEAR TECHNOLOGIES PVT LTD',
+      point_name: 'OLPURA GHOGHA BiharOLPURA GHOGHA BiharOLPURA GHOGHA Bihar',
+      shop_id: 'RCE-RSC00893',
+      ceId: 'RCE209',
+      s500: '3',
+      s200: '18',
+      s100: '25',
+      s50: '10',
+      s20: '2',
+      s10: '1',
+      s5: '0',
+      coins: '0',
+      pickup_amount: '8150',
+      Name: 'MITHILESH KUMAR',
+      Mobile: '7366007448',
+      PhotoName: 'https://vastbazaar.com/Uploads/4726ac2c-d757-42c7-bb1c-39dfc176ceca139Photomitlesh pic.jpg',
+      contact_peroson: 'Anile Kumar',
+      contact_Mobile: '+91 8955664610',
+      Email: 'N/A',
     },
     {
-      Amountinwords: "Five Thousand Four Hundred and Thirty-Two Rupees Only",
-      pis_hcl_no: "892346",
-      hcl_no: "X9334895",
-      transId: "264832574",
-      trans_date: "2025-08-18 09:20",
-      cust_name: "TECHNEXT SOLUTIONS",
-      point_name: "SARAI BAZAR MuzaffarpurSARAI BAZAR Muzaffarpur",
-      shop_id: "RCE-RSC00123",
-      ceId: "RCE307",
-      s500: "2",
-      s200: "10",
-      s100: "15",
-      s50: "5",
-      s20: "3",
-      s10: "0",
-      s5: "4",
-      coins: "1",
-      pickup_amount: "5432",
-      Name: "SUMIT RAI",
-      Mobile: "9478362190",
-      PhotoName: "https://example.com/Images/SumitRai.jpg",
-      contact_peroson: "Praveen Kumar",
-      contact_Mobile: "+91 9087654321",
-      Email: "sumitrai@email.com"
+      Amountinwords: 'Five Thousand Four Hundred and Thirty-Two Rupees Only',
+      pis_hcl_no: '892346',
+      hcl_no: 'X9334895',
+      transId: '264832574',
+      trans_date: '2025-08-18 09:20',
+      cust_name: 'TECHNEXT SOLUTIONS',
+      point_name: 'SARAI BAZAR MuzaffarpurSARAI BAZAR Muzaffarpur',
+      shop_id: 'RCE-RSC00123',
+      ceId: 'RCE307',
+      s500: '2',
+      s200: '10',
+      s100: '15',
+      s50: '5',
+      s20: '3',
+      s10: '0',
+      s5: '4',
+      coins: '1',
+      pickup_amount: '5432',
+      Name: 'SUMIT RAI',
+      Mobile: '9478362190',
+      PhotoName: 'https://example.com/Images/SumitRai.jpg',
+      contact_peroson: 'Praveen Kumar',
+      contact_Mobile: '+91 9087654321',
+      Email: 'sumitrai@email.com',
     },
     {
-      Amountinwords: "Five Thousand Four Hundred and Thirty-Two Rupees Only",
-      pis_hcl_no: "892346",
-      hcl_no: "X9334895",
-      transId: "264832574",
-      trans_date: "2025-08-18 09:20",
-      cust_name: "TECHNEXT SOLUTIONS",
-      point_name: "SARAI BAZAR MuzaffarpurSARAI BAZAR Muzaffarpur",
-      shop_id: "RCE-RSC00123",
-      ceId: "RCE307",
-      s500: "2",
-      s200: "10",
-      s100: "15",
-      s50: "5",
-      s20: "3",
-      s10: "0",
-      s5: "4",
-      coins: "1",
-      pickup_amount: "5432",
-      Name: "SUMIT RAI",
-      Mobile: "9478362190",
-      PhotoName: "https://example.com/Images/SumitRai.jpg",
-      contact_peroson: "Praveen Kumar",
-      contact_Mobile: "+91 9087654321",
-      Email: "sumitrai@email.com"
+      Amountinwords: 'Five Thousand Four Hundred and Thirty-Two Rupees Only',
+      pis_hcl_no: '892346',
+      hcl_no: 'X9334895',
+      transId: '264832574',
+      trans_date: '2025-08-18 09:20',
+      cust_name: 'TECHNEXT SOLUTIONS',
+      point_name: 'SARAI BAZAR MuzaffarpurSARAI BAZAR Muzaffarpur',
+      shop_id: 'RCE-RSC00123',
+      ceId: 'RCE307',
+      s500: '2',
+      s200: '10',
+      s100: '15',
+      s50: '5',
+      s20: '3',
+      s10: '0',
+      s5: '4',
+      coins: '1',
+      pickup_amount: '5432',
+      Name: 'SUMIT RAI',
+      Mobile: '9478362190',
+      PhotoName: 'https://example.com/Images/SumitRai.jpg',
+      contact_peroson: 'Praveen Kumar',
+      contact_Mobile: '+91 9087654321',
+      Email: 'sumitrai@email.com',
     },
     {
-      Amountinwords: "Five Thousand Four Hundred and Thirty-Two Rupees Only",
-      pis_hcl_no: "892346",
-      hcl_no: "X9334895",
-      transId: "264832574",
-      trans_date: "2025-08-18 09:20",
-      cust_name: "TECHNEXT SOLUTIONS",
-      point_name: "SARAI BAZAR MuzaffarpurSARAI BAZAR Muzaffarpur",
-      shop_id: "RCE-RSC00123",
-      ceId: "RCE307",
-      s500: "2",
-      s200: "10",
-      s100: "15",
-      s50: "5",
-      s20: "3",
-      s10: "0",
-      s5: "4",
-      coins: "1",
-      pickup_amount: "5432",
-      Name: "SUMIT RAI",
-      Mobile: "9478362190",
-      PhotoName: "https://example.com/Images/SumitRai.jpg",
-      contact_peroson: "Praveen Kumar",
-      contact_Mobile: "+91 9087654321",
-      Email: "sumitrai@email.com"
-    }
+      Amountinwords: 'Five Thousand Four Hundred and Thirty-Two Rupees Only',
+      pis_hcl_no: '892346',
+      hcl_no: 'X9334895',
+      transId: '264832574',
+      trans_date: '2025-08-18 09:20',
+      cust_name: 'TECHNEXT SOLUTIONS',
+      point_name: 'SARAI BAZAR MuzaffarpurSARAI BAZAR Muzaffarpur',
+      shop_id: 'RCE-RSC00123',
+      ceId: 'RCE307',
+      s500: '2',
+      s200: '10',
+      s100: '15',
+      s50: '5',
+      s20: '3',
+      s10: '0',
+      s5: '4',
+      coins: '1',
+      pickup_amount: '5432',
+      Name: 'SUMIT RAI',
+      Mobile: '9478362190',
+      PhotoName: 'https://example.com/Images/SumitRai.jpg',
+      contact_peroson: 'Praveen Kumar',
+      contact_Mobile: '+91 9087654321',
+      Email: 'sumitrai@email.com',
+    },
   ];
 
   const capRef = useRef();
@@ -221,7 +222,7 @@ const PickupSummaryScreen = ({ route }) => {
 
     try {
       const uri = await captureRef(capRef, {
-        format: "jpg",
+        format: 'jpg',
         quality: 0.7,
       });
       await Share.open({
@@ -229,7 +230,7 @@ const PickupSummaryScreen = ({ route }) => {
         url: uri,
       });
     } catch (e) {
-      ToastAndroid.show("Transaction details not shared", ToastAndroid.SHORT);
+      ToastAndroid.show('Transaction details not shared', ToastAndroid.SHORT);
     }
   }, []);
 
@@ -256,9 +257,9 @@ const PickupSummaryScreen = ({ route }) => {
     return (
       <View style={styles.table}>
         <View style={styles.tableHeader}>
-          <Text style={[styles.tableCell, styles.headerCell, styles.col25]}>{translate("Denom")}</Text>
-          <Text style={[styles.tableCell, styles.headerCell, styles.col25]}>{translate("No_of_Notes")}</Text>
-          <Text style={[styles.tableCell, styles.headerCell, styles.col50]}>{translate("Amount_INR")}</Text>
+          <Text style={[styles.tableCell, styles.headerCell, styles.col25]}>{translate('Denom')}</Text>
+          <Text style={[styles.tableCell, styles.headerCell, styles.col25]}>{translate('No_of_Notes')}</Text>
+          <Text style={[styles.tableCell, styles.headerCell, styles.col50]}>{translate('Amount_INR')}</Text>
         </View>
 
         {denominations.map((item, idx) => (
@@ -272,10 +273,10 @@ const PickupSummaryScreen = ({ route }) => {
         ))}
 
         <View style={styles.tableRow}>
-          <Text style={[styles.tableCell, styles.col25, { fontWeight: 'bold' }]}>{translate("Total_Amount")}</Text>
-          <Text style={[styles.tableCell, styles.col25]}></Text>
+          <Text style={[styles.tableCell, styles.col25, { fontWeight: 'bold' }]}>{translate('Total_Amount')}</Text>
+          <Text style={[styles.tableCell, styles.col25]} />
 
-          <Text style={[styles.tableCell, styles.col50, { fontWeight: 'bold', }]}>
+          <Text style={[styles.tableCell, styles.col50, { fontWeight: 'bold' }]}>
             {entry?.pickup_amount || '---'}
           </Text>
         </View>
@@ -291,23 +292,27 @@ const PickupSummaryScreen = ({ route }) => {
     const CodeId = entry?.transId;
 
     return (
-      <ScrollView style={{ flex: 1, }}>
+      <ScrollView style={{ flex: 1 }}>
         <ViewShot ref={capRef}
           options={{
-            fileName: "TransactionReciept",
-            format: "jpg",
+            fileName: 'TransactionReciept',
+            format: 'jpg',
             quality: 0.9,
           }}>
           <View style={styles.topcontainer}>
 
-            <Image source={require('../../../../assets/images/radiant.png')} style={styles.imgstyle} resizeMode="contain" />
+            <FastImage
+            //  source={require('../../../../assets/images/radiant.png')}
+            source={{uri:IMAGE_BASE_URL + 'radiant.png'}}
+             style={styles.imgstyle} resizeMode="contain" />
             <View>
-              <Text style={styles.title}>{translate("Radiant")}</Text>
-              <Text style={styles.title2}>{translate("CASH_MANAGEMENT_SERVICES_LIMITED")}</Text>
-              <Text style={styles.companyISO}>{translate("An_ISO_9001_2015_Company")}</Text>
+              <Text style={styles.title}>{translate('Radiant')}</Text>
+              <Text style={styles.title2}>{translate('CASH_MANAGEMENT_SERVICES_LIMITED')}</Text>
+              <Text style={styles.companyISO}>{translate('An_ISO_9001_2015_Company')}</Text>
             </View>
-            <Image source={require('../../../../assets/images/cmsImg/CmsSlipQr.jpg')}
-              style={{ width: wScale(70), height: hScale(70), }} resizeMode='center'
+            <FastImage
+             source={{uri:IMAGE_BASE_URL+'CmsSlipQr.jpg'}}
+              style={{ width: wScale(70), height: hScale(70) }} resizeMode="center"
             />
 
           </View>
@@ -317,33 +322,33 @@ const PickupSummaryScreen = ({ route }) => {
               <View style={styles.row}>
                 <Text style={styles.time}>{entry?.hcislipallow === 'NotAllow' ? 'REQ ID- ' : 'Hci Slip'}
                   <Text style={{ color: '#191970' }}>{entry?.hcl_no || '---'}</Text></Text>
-                <Text style={[styles.time,]}>Pickup Time: {entry?.trans_date || '---'}</Text>
+                <Text style={[styles.time]}>Pickup Time: {entry?.trans_date || '---'}</Text>
               </View>
 
-              <Text style={styles.label}>{translate("Customer_Bank_Name")}</Text>
+              <Text style={styles.label}>{translate('Customer_Bank_Name')}</Text>
               <Text style={styles.linkText}><Text style={{ color: '#191970' }}>{entry?.cust_name || '---'}</Text></Text>
 
-              <Text style={styles.label}>{translate("Pickup_Point_Name_Address")}</Text>
+              <Text style={styles.label}>{translate('Pickup_Point_Name_Address')}</Text>
               <Text style={[styles.value, { fontSize: 12 }]}>{entry?.point_name || '---'}</Text>
 
               <View style={styles.row}>
                 <View>
-                  <Text style={styles.label}>{translate("Point_Contact_Person")}</Text>
+                  <Text style={styles.label}>{translate('Point_Contact_Person')}</Text>
                   <Text style={styles.value}>{entry?.ClientName || '---'}</Text>
                 </View>
                 <View style={styles.rightColum}>
-                  <Text style={styles.label}>{translate("Point_Mobile_Number")}</Text>
+                  <Text style={styles.label}>{translate('Point_Mobile_Number')}</Text>
                   <Text style={styles.value}>{entry?.ClientMobile || '---'}</Text>
                 </View>
               </View>
 
               <View style={styles.row}>
                 <View>
-                  <Text style={styles.label}>{translate("PointClientShop_ID")}</Text>
+                  <Text style={styles.label}>{translate('PointClientShop_ID')}</Text>
                   <Text style={styles.value}>{entry?.shop_id || '---'}</Text>
                 </View>
                 <View style={styles.rightColum}>
-                  <Text style={styles.label}>{translate("Pickup_Transaction_ID")}</Text>
+                  <Text style={styles.label}>{translate('Pickup_Transaction_ID')}</Text>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View style={{ borderRadius: 20, backgroundColor: 'green', alignItems: 'center', padding: 5 }}>
                       <CheckSvg size={7} />
@@ -355,22 +360,22 @@ const PickupSummaryScreen = ({ route }) => {
             </View>
 
             <View style={styles.rceSection}>
-              <Image source={{ uri: entry?.PhotoName }} style={styles.avatar} resizeMode='stretch' />
+              <FastImage source={{ uri: entry?.PhotoName }} style={styles.avatar} resizeMode="stretch" />
               <View style={{ flex: 1 }}>
                 <View style={styles.row}>
-                  <Text style={[styles.rceText, styles.bold]}>{translate("RCEs_Name")}</Text>
+                  <Text style={[styles.rceText, styles.bold]}>{translate('RCEs_Name')}</Text>
                   <Text style={styles.rceText}>{entry?.Name || '---'}</Text>
                 </View>
                 <View style={styles.row}>
-                  <Text style={[styles.rceText, styles.bold]}>{translate("Employee_ID")}</Text>
+                  <Text style={[styles.rceText, styles.bold]}>{translate('Employee_ID')}</Text>
                   <Text style={styles.rceText}>{entry?.ceId || '---'}</Text>
                 </View>
                 <View style={styles.row}>
-                  <Text style={[styles.rceText, styles.bold]}>{translate("Mobile_No")}</Text>
+                  <Text style={[styles.rceText, styles.bold]}>{translate('Mobile_No')}</Text>
                   <Text style={styles.rceText}>{entry?.Mobile || '---'}</Text>
                 </View>
                 <View style={styles.row}>
-                  <Text style={[styles.rceText, styles.bold]}>{translate("Email_ID")}</Text>
+                  <Text style={[styles.rceText, styles.bold]}>{translate('Email_ID')}</Text>
                   <Text style={styles.rceText}>{entry?.emailid || '---'}</Text>
                 </View>
               </View>
@@ -382,7 +387,7 @@ const PickupSummaryScreen = ({ route }) => {
               <Text style={styles.amountWordsText}>Amount in Words: {entry?.Amountinwords || '---'}</Text>
             </View>
 
-            <Text style={styles.footerText}>{translate("key_thisisa_157")}</Text>
+            <Text style={styles.footerText}>{translate('key_thisisa_157')}</Text>
           </View>
         </ViewShot>
 
@@ -391,23 +396,23 @@ const PickupSummaryScreen = ({ route }) => {
     );
   };
   useEffect(() => {
-    console.log("Current Tab Index:", index === data.length);
+    console.log('Current Tab Index:', index === data.length);
   }, [index]);
 
-  if (isLoading) return <ShowLoader />;
+  if (isLoading) {return <ShowLoader />;}
 
   return (
     <View style={{ flex: 1 }}>
       <AppBarSecond title="Pickup Summary"
         onPressBack={() => navigation.navigate('CashPickup')}
         actionButton={
-          <TouchableOpacity style={{ alignItems: 'center', }} onPress={onShare}>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={onShare}>
             <FontAwesome
               name="whatsapp"
               color="#fff"
               size={20}
             />
-            <Text style={{ color: '#fff', fontSize: wScale(10) }}>{translate("ShareSlip")}</Text>
+            <Text style={{ color: '#fff', fontSize: wScale(10) }}>{translate('ShareSlip')}</Text>
           </TouchableOpacity>}
         onActionPress={() => { }}
       />
@@ -454,13 +459,13 @@ export default PickupSummaryScreen;
 
 const styles = StyleSheet.create({
   main: {
-    flex: 1
+    flex: 1,
   },
   container: {
     backgroundColor: '#fff',
     paddingHorizontal: wScale(10),
     flex: 1,
-    paddingBottom: hScale(20)
+    paddingBottom: hScale(20),
   },
   header: {
     backgroundColor: '#4f64f5',
@@ -495,7 +500,7 @@ const styles = StyleSheet.create({
   companyISO: {
     color: '#ccc',
     fontSize: wScale(15),
-    textAlign: 'center'
+    textAlign: 'center',
   },
   infoSection: {
     marginTop: hScale(0),
@@ -527,7 +532,7 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: hScale(12),
     fontWeight: 'bold',
-    marginTop: hScale(5)
+    marginTop: hScale(5),
   },
   bold: {
     fontWeight: 'bold',
@@ -566,26 +571,26 @@ const styles = StyleSheet.create({
   },
   table: {
     marginTop: hScale(10),
-    borderWidth: wScale(.5),
+    borderWidth: wScale(0.5),
     borderColor: '#000',
   },
   tableHeader: {
     flexDirection: 'row',
-    borderBottomWidth: wScale(.5),
+    borderBottomWidth: wScale(0.5),
     backgroundColor: '#ddd',
   },
   tableRow: {
     flexDirection: 'row',
-    borderBottomWidth: wScale(.5),
+    borderBottomWidth: wScale(0.5),
   },
   tableCell: {
     flex: 1,
-    borderRightWidth: wScale(.5),
+    borderRightWidth: wScale(0.5),
     borderColor: '#000',
     textAlign: 'center',
     color: '#1c5ed3',
     fontSize: wScale(13),
-    padding: hScale(2)
+    padding: hScale(2),
   },
   headerCell: {
     fontWeight: 'bold',
@@ -605,7 +610,7 @@ const styles = StyleSheet.create({
     borderWidth: wScale(4),
     marginBottom: hScale(0),
     backgroundColor: '#271851',
-    marginTop: hScale(8)
+    marginTop: hScale(8),
   },
   imgstyle: {
     width: wScale(75),
@@ -620,13 +625,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     textTransform: 'uppercase',
     letterSpacing: wScale(8),
-    lineHeight: hScale(35)
+    lineHeight: hScale(35),
   },
   title2: {
     fontSize: wScale(12),
     color: '#fff',
     marginTop: hScale(-6),
-    paddingLeft: wScale(5)
+    paddingLeft: wScale(5),
   },
   col25: {
     flex: 1,
@@ -642,7 +647,7 @@ const styles = StyleSheet.create({
     fontSize: wScale(12),
     color: '#191970',
     textAlign: 'center',
-    marginTop: hScale(9)
+    marginTop: hScale(9),
   },
   indicator: {
     backgroundColor: '#191970',
