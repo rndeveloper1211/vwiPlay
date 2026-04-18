@@ -1,11 +1,7 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useRef } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  StatusBar,
-  Platform,
+  View, Text, StyleSheet, TouchableOpacity,
+  StatusBar, Platform, Animated,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
@@ -32,7 +28,7 @@ import DayBookSvg from "../drawer/svgimgcomponents/DayBookSvg";
 import RToRiportSvg from "../drawer/svgimgcomponents/RToRiportSvg";
 import Paymentsvg from "../drawer/svgimgcomponents/Paymentsvg";
 
-// ─── Icon colors (light pastel for dark bg) ───────────────────────────────────
+// ─── Constants (module-level, ek baar hi banta hai) ──────────────────────────
 const ICON_COLOR: Record<string, string> = {
   "Day Earning":           "#6EE7B7",
   "Ledger":                "#93C5FD",
@@ -73,118 +69,107 @@ const ROUTE_MAP: Record<string, string> = {
   "Commission Report":      "CommissionReport",
 };
 
-const getSvgComponent = (item: string) => {
-  const iconColor = ICON_COLOR[item] ?? "#CBD5E1";
-  const props = { color: iconColor, size: 26 };
+// Pure function — component tree ke bahar, re-render se immune
+const getSvgIcon = (item: string, color: string) => {
+  const p = { color, size: 26 };
   switch (item) {
-    case "Day Earning":             return <DayEarnsvg {...props} />;
-    case "Ledger":
-    case "Day Ledger":              return <DayLedgerSvg {...props} />;
-    case "Day & Month Book":
-    case "Day Book":                return <DayBookSvg {...props} />;
-    case "Added Money":             return <AddedMoneySvg {...props} />;
-    case "R TO R":                  return <RToRSvg {...props} />;
-    case "Credit Report":           return <Paymentsvg {...props} />;
-    case "Fund Transfer History":
-    case "R TO R Report":           return <RToRiportSvg {...props} />;
-    case "Fund Receive Report":     return <FundReceivedSvg {...props} />;
-    case "Operator Commission":     return <OperatorCommissionSvg {...props} />;
-    case "Manage A/C":              return <ManageAccountSvg {...props} />;
-    case "Purchase order Report":   return <PurchaseOrderSvg {...props} />;
-    case "Dispute Report":          return <DisputeSvg {...props} />;
-    case "Other Links":             return <OtherLinksSvg {...props} />;
-    case "Commission Report":       return <Paymentsvg {...props} />;
-    default:                        return null;
+    case "Day Earning":                             return <DayEarnsvg {...p} />;
+    case "Ledger": case "Day Ledger":               return <DayLedgerSvg {...p} />;
+    case "Day & Month Book": case "Day Book":       return <DayBookSvg {...p} />;
+    case "Added Money":                             return <AddedMoneySvg {...p} />;
+    case "R TO R":                                  return <RToRSvg {...p} />;
+    case "Credit Report": case "Commission Report": return <Paymentsvg {...p} />;
+    case "Fund Transfer History": case "R TO R Report": return <RToRiportSvg {...p} />;
+    case "Fund Receive Report":                     return <FundReceivedSvg {...p} />;
+    case "Operator Commission":                     return <OperatorCommissionSvg {...p} />;
+    case "Manage A/C":                              return <ManageAccountSvg {...p} />;
+    case "Purchase order Report":                   return <PurchaseOrderSvg {...p} />;
+    case "Dispute Report":                          return <DisputeSvg {...p} />;
+    case "Other Links":                             return <OtherLinksSvg {...p} />;
+    default:                                        return null;
   }
 };
 
-// ─── Floating orbs (no library needed) ───────────────────────────────────────
-const GlowOrbs = ({ primaryColor }: { primaryColor: string }) => (
-  <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-    <View style={[styles.orb, {
-      top: -80, left: -80,
-      width: 240, height: 240,
-      backgroundColor: `${primaryColor}80`,   // ✅ aapka color
-    }]} />
-    <View style={[styles.orb, {
-      top: 160, right: -100,
-      width: 280, height: 280,
-      backgroundColor: `${primaryColor}28`,   // ✅ aapka color
-    }]} />
-    <View style={[styles.orb, {
-      top: 380, left: 20,
-      width: 160, height: 160,
-      backgroundColor: "rgba(5,150,105,0.18)",
-    }]} />
-    <View style={[styles.orb, {
-      bottom: 60, right: 10,
-      width: 200, height: 200,
-      backgroundColor: "rgba(219,39,119,0.16)",
-    }]} />
-  </View>
-);
+// Static gradient arrays — inline likhne se har render pe naya array banta tha
+const CARD_GLASS   = ["rgba(255,255,255,0.20)", "rgba(255,255,255,0.05)"] as const;
+const SHIMMER_GRAD = ["rgba(255,255,255,0.35)", "rgba(255,255,255,0)"]    as const;
+const SHEET_GRAD   = ["rgba(255,255,255,0.12)", "rgba(255,255,255,0.03)"] as const;
+const GRAD_START   = { x: 0, y: 0 } as const;
+const GRAD_END_D   = { x: 1, y: 1 } as const;
+const GRAD_END_V   = { x: 0, y: 1 } as const;
 
-// ─── Glass Card (no BlurView — pure RN) ──────────────────────────────────────
-interface CardProps {
-  item: string;
-  onPress: (item: string) => void;
-}
+// Spring configs
+const SPRING_IN  = { toValue: 0.93, useNativeDriver: true, speed: 50, bounciness: 4 } as const;
+const SPRING_OUT = { toValue: 1,    useNativeDriver: true, speed: 30, bounciness: 6 } as const;
+
+// ─── Orbs — static layout, no props drilling needed ──────────────────────────
+const GlowOrbs = React.memo(({ primaryColor }: { primaryColor: string }) => (
+  <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+    <View style={[styles.orb, { top: -80,  left: -80,   width: 260, height: 260, backgroundColor: `${primaryColor}70` }]} />
+    <View style={[styles.orb, { top: 180,  right: -100, width: 300, height: 300, backgroundColor: `${primaryColor}22` }]} />
+    <View style={[styles.orb, { top: 400,  left: 10,    width: 180, height: 180, backgroundColor: "rgba(5,150,105,0.15)" }]} />
+    <View style={[styles.orb, { bottom:80, right: 20,   width: 220, height: 220, backgroundColor: "rgba(219,39,119,0.12)" }]} />
+  </View>
+));
+
+// ─── Card ─────────────────────────────────────────────────────────────────────
+interface CardProps { item: string; onPress: (item: string) => void; }
 
 const AccReportCard = React.memo(({ item, onPress }: CardProps) => {
-  const iconColor = ICON_COLOR[item] ?? "#CBD5E1";
+  const color    = ICON_COLOR[item] ?? "#CBD5E1";
+  const scaleRef = useRef(new Animated.Value(1)).current;        // ✅ useRef — no re-create
+
+  // Memoized dynamic styles (color changes nahi, so safe)
+  const borderStyle    = useMemo(() => ({ borderColor: `${color}30` }),                    [color]);
+  const iconGlowShadow = useMemo(() => ({ shadowColor: color }),                           [color]);
+  const iconGradColors = useMemo(() => [`${color}40`, `${color}12`] as [string, string],   [color]);
+
+  const onPressIn  = useCallback(() => Animated.spring(scaleRef, SPRING_IN ).start(), [scaleRef]);
+  const onPressOut = useCallback(() => Animated.spring(scaleRef, SPRING_OUT).start(), [scaleRef]);
+  const handlePress= useCallback(() => onPress(item), [item, onPress]);
 
   return (
     <View style={styles.itemWrapper}>
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={() => onPress(item)}
-        style={styles.cardOuter}
-      >
-        {/* Glass base layer */}
-        <LinearGradient
-          colors={["rgba(255,255,255,0.18)", "rgba(255,255,255,0.06)"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFillObject}
-        />
+      <Animated.View style={{ transform: [{ scale: scaleRef }] }}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={handlePress}
+          onPressIn={onPressIn}
+          onPressOut={onPressOut}
+          style={[styles.cardOuter, borderStyle]}
+        >
+          <LinearGradient colors={CARD_GLASS}   start={GRAD_START} end={GRAD_END_D} style={StyleSheet.absoluteFillObject} />
+          <LinearGradient colors={SHIMMER_GRAD} start={GRAD_START} end={GRAD_END_V} style={styles.topShimmer} />
 
-        {/* Top shimmer highlight */}
-        <LinearGradient
-          colors={["rgba(255,255,255,0)", "rgba(255,255,255,0)"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={styles.topShimmer}
-        />
+          <View style={[styles.iconGlow, iconGlowShadow]}>
+            <LinearGradient colors={iconGradColors} start={GRAD_START} end={GRAD_END_D} style={styles.iconInner}>
+              {getSvgIcon(item, color)}
+            </LinearGradient>
+          </View>
 
-        {/* Icon glow ring */}
-        <View style={[styles.iconGlow, { shadowColor: iconColor }]}>
-          <LinearGradient
-            colors={[`${iconColor}33`, `${iconColor}11`]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.iconInner}
-          >
-            {getSvgComponent(item)}
-          </LinearGradient>
-        </View>
-
-        <Text numberOfLines={2} style={styles.itemText}>
-          {translate(item)}
-        </Text>
-      </TouchableOpacity>
+          <Text numberOfLines={2} style={styles.itemText}>
+            {translate(item)}
+          </Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 });
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 const AccReportScreen = () => {
-  const navigation = useNavigation<any>();
-  const { colorConfig, IsDealer } = useSelector((s: RootState) => s.userInfo);
+  const navigation                   = useNavigation<any>();
+  const { colorConfig, IsDealer }    = useSelector((s: RootState) => s.userInfo);
+
+  const bgGradColors = useMemo(
+    () => [colorConfig.primaryColor, colorConfig.secondaryColor] as [string, string],
+    [colorConfig.primaryColor, colorConfig.secondaryColor]
+  );
 
   const gridItems = useMemo(() => [
     "Day Earning",
-    IsDealer ? "Ledger" : "Day Ledger",
-    IsDealer ? "Day & Month Book" : "Day Book",
+    IsDealer ? "Ledger"             : "Day Ledger",
+    IsDealer ? "Day & Month Book"   : "Day Book",
     ...(!IsDealer ? ["Added Money", "R TO R"] : []),
     ...(IsDealer  ? ["Credit Report"]         : []),
     IsDealer ? "Fund Transfer History" : "R TO R Report",
@@ -197,18 +182,13 @@ const AccReportScreen = () => {
     ...(!IsDealer ? ["Other Links"] : []),
   ], [IsDealer]);
 
-  const handlePress = useCallback(
-    (item: string) => {
-      const route = ROUTE_MAP[item];
-      if (route) navigation.navigate(route);
-    },
-    [navigation]
-  );
+  const handlePress  = useCallback((item: string) => {
+    const route = ROUTE_MAP[item];
+    if (route) navigation.navigate(route);
+  }, [navigation]);
 
   const renderItem = useCallback(
-    ({ item }: { item: string }) => (
-      <AccReportCard item={item} onPress={handlePress} />
-    ),
+    ({ item }: { item: string }) => <AccReportCard item={item} onPress={handlePress} />,
     [handlePress]
   );
 
@@ -216,30 +196,19 @@ const AccReportScreen = () => {
     <View style={styles.main}>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
+      <LinearGradient
+        colors={bgGradColors}
+        start={{ x: 0.1, y: 0 }}
+        end={{ x: 0.9, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+      />
 
-<LinearGradient
-  colors={[colorConfig.primaryColor, colorConfig.secondaryColor]}
-  start={{ x: 0.1, y: 0 }}
-  end={{ x: 0.9, y: 1 }}
-  style={StyleSheet.absoluteFillObject}
-/>
-
-      {/* Glow orbs */}
-      <GlowOrbs  primaryColor={colorConfig.primaryColor}/>
-
+      <GlowOrbs primaryColor={colorConfig.primaryColor} />
       <DashboardHeader />
 
-      {/* Glass bottom sheet */}
       <View style={styles.sheet}>
-        <LinearGradient
-          colors={["rgba(255,255,255,0.1)", "rgba(255,255,255,0.03)"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={StyleSheet.absoluteFillObject}
-        />
-        {/* Sheet top shimmer */}
+        <LinearGradient colors={SHEET_GRAD} start={GRAD_START} end={GRAD_END_V} style={StyleSheet.absoluteFillObject} />
         <View style={styles.sheetTopLine} />
-
         <FlashList
           data={gridItems}
           renderItem={renderItem}
@@ -258,101 +227,51 @@ const AccReportScreen = () => {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  main: { flex: 1 },
+  main:        { flex: 1 },
+  orb:         { position: "absolute", borderRadius: 999 },
 
-  // ── Orbs ──
-  orb: {
-    position:      "absolute",
-    borderRadius:  999,
-  },
-
-  // ── Sheet ──
   sheet: {
-    flex:                1,
-    borderTopLeftRadius:  28,
-    borderTopRightRadius: 28,
-    marginTop:            hScale(8),
-    overflow:             "hidden",
-    borderWidth:          1,
-    borderColor:          "rgba(255,255,255,0.15)",
-    borderBottomWidth:    0,
+    flex: 1, marginTop: hScale(8),
+    borderTopLeftRadius: 28, borderTopRightRadius: 28,
+    overflow: "hidden",
+    borderWidth: 1, borderColor: "rgba(255,255,255,0.18)", borderBottomWidth: 0,
+    shadowColor: "#000", shadowOffset: { width: 0, height: -4 },
+    //shadowOpacity: 0.3, shadowRadius: 16, elevation: 12,
   },
   sheetTopLine: {
-    position:        "absolute",
-    top:             0,
-    left:            "20%",
-    right:           "20%",
-    height:          1.5,
-    backgroundColor: "rgba(255,255,255,0.5)",
-    borderRadius:    999,
-    zIndex:          1,
+    position: "absolute", top: 0, left: "20%", right: "20%", zIndex: 1,
+    height: 1.5, backgroundColor: "rgba(255,255,255,0.55)", borderRadius: 999,
   },
   listContent: {
-    paddingTop:        hScale(16),
-    paddingHorizontal: wScale(8),
-    paddingBottom:     hScale(100),
+    paddingTop: hScale(16), paddingHorizontal: wScale(8), paddingBottom: hScale(100),
   },
 
-  // ── Card ──
-  itemWrapper: {
-    flex:    1,
-    padding: wScale(5),
-  },
+  itemWrapper: { flex: 1, padding: wScale(5) },
   cardOuter: {
-    borderRadius:      20,
-    height:            hScale(110),
-    justifyContent:    "center",
-    alignItems:        "center",
-    paddingHorizontal: wScale(4),
-    overflow:          "hidden",
-    borderWidth:       1,
-   // borderColor:       "rgba(255,255,255,0.2)",
-    // Card glow shadow
-    //shadowColor:       "rgba(139,92,246,1)",
-    // shadowOffset:      { width: 0, height: 4 },
-    // shadowOpacity:     0.35,
-    // shadowRadius:      12,
-    // elevation:         8,
+    borderRadius: 20, height: hScale(110), overflow: "hidden",
+    justifyContent: "center", alignItems: "center",
+    paddingHorizontal: wScale(4), borderWidth: 1,
+    shadowColor: "rgba(255,255,255,0.6)",
+   // shadowOffset: { width: 0, height: -1 }, shadowOpacity: 1, shadowRadius: 0,
+    //elevation: 4,
   },
   topShimmer: {
-    position:      "absolute",
-    top:           0,
-    left:          0,
-    right:         0,
-    height:        hScale(36),
-    borderTopLeftRadius:  16,
-    borderTopRightRadius: 16,
+    position: "absolute", top: 0, left: 0, right: 0, height: hScale(40),
+    borderTopLeftRadius: 18, borderTopRightRadius: 18,
   },
-
-  // ── Icon ──
   iconGlow: {
-    marginBottom:  hScale(8),
-    //shadowOffset:  { width: 0, height: 0 },
-   // shadowOpacity: 0.8,
-   // shadowRadius:  8,
-   // elevation:     6,
+    marginBottom: hScale(8),
+    //shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.75, shadowRadius: 8, elevation: 6,
   },
   iconInner: {
-    height:        hScale(46),
-    width:         hScale(46),
-    borderRadius:  13,
-    justifyContent:"center",
-    alignItems:    "center",
-    borderWidth:   1,
-    borderColor:   "rgba(255,255,255,0.2)",
+    height: hScale(46), width: hScale(46), borderRadius: 13,
+    justifyContent: "center", alignItems: "center",
+    borderWidth: 1, borderColor: "rgba(255,255,255,0.25)",
   },
-
-  // ── Label ──
   itemText: {
-    color:             "rgba(255,255,255,0.9)",
-    fontSize:          wScale(10),
-    textAlign:         "center",
-    fontWeight:        "600",
-    lineHeight:        hScale(14),
-    paddingHorizontal: 2,
-    textShadowColor:   "rgba(0,0,0,0.5)",
-    textShadowOffset:  { width: 0, height: 1 },
-    textShadowRadius:  3,
+    color: "rgba(255,255,255,0.92)", fontSize: wScale(13), textAlign: "center",
+    fontWeight: "bold", lineHeight: hScale(14), paddingHorizontal: 2,
+    textShadowColor: "rgba(0,0,0,0.6)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4,
   },
 });
 

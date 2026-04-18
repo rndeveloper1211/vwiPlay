@@ -56,7 +56,7 @@ const OperatorItem = React.memo(({
         <Image source={{ uri: item["path"] }} style={styles.itemImg} />
       ) : (
         <Text style={[styles.iconFallback, { color: primaryColor }]}>
-          {(isOperator ? item["Operatorname"] : item["State Name"])
+          {(isOperator ? item["Operatorname"] : item["Sate Name"])
             ?.charAt(0)
             ?.toUpperCase()}
         </Text>
@@ -164,19 +164,20 @@ const SearchBar = ({
 // Main Component
 // ─────────────────────────────────────────────────
 const OperatorBottomSheet: React.FC<Props> = ({
-  operatorData,
+  //operatorData,
   stateData,
   isModalVisible,
   selectedOperator,
-  setModalVisible,
+  ///setModalVisible,
   selectOperator,
   setOperatorcode,
   setCircle,
   setState,
   showState = false,
-  setOperator,
-  selectOperatorImage,
-  path,
+  operatorData       = [],
+setModalVisible    = () => {},
+selectOperatorImage = () => {}  , // ← yahi crash fix karta hai
+path               = '',
   handleItemPress,
 }) => {
   const insets = useSafeAreaInsets(); // ✅ ADD

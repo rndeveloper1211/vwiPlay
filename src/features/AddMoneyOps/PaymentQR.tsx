@@ -29,6 +29,8 @@ import MovingDotBorderText from '../../components/AnimatedBorderView';
 import ClosseModalSvg2 from '../drawer/svgimgcomponents/ClosseModal2';
 import ClosseModalSvg from '../drawer/svgimgcomponents/ClosseModal';
 import { translate } from '../../utils/languageUtils/I18n';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { color } from '@rneui/base';
 
 export default function PaymentQR({
   QrImg,
@@ -151,61 +153,71 @@ export default function PaymentQR({
             </>
           )}
         </View>
-  <Modal
+<Modal
   visible={showModal}
   onDismiss={() => setShowModal(false)}
   contentContainerStyle={styles.modalContainer}
 >
-  {/* Close Button */}
-  <TouchableOpacity
-    style={styles.closeBtn}
-    onPress={() => setShowModal(false)}
+  <KeyboardAwareScrollView
+    enableOnAndroid={true}
+    enableAutomaticScroll={true}
+    extraScrollHeight={hScale(80)}      // keyboard ke upar kitna space
+    keyboardShouldPersistTaps="handled"
+    showsVerticalScrollIndicator={false}
+    contentContainerStyle={{ flexGrow: 1 }}
   >
-    <ClosseModalSvg />
-  </TouchableOpacity>
+    {/* Close Button */}
+    <TouchableOpacity
+      style={styles.closeBtn}
+      onPress={() => setShowModal(false)}
+    >
+      <ClosseModalSvg />
+    </TouchableOpacity>
 
-  {/* Icon */}
-  <View style={styles.iconCircle}>
-    <Text style={styles.iconText}>₹</Text>
-  </View>
+    {/* Icon */}
+    <View style={[styles.iconCircle,{backgroundColor:colorConfig.secondaryButtonColor}]}>
+      <Text style={styles.iconText}>₹</Text>
+    </View>
 
-  {/* Title */}
-  <Text style={styles.modalTitle}>{translate('Enter UTR Number')}</Text>
-  <Text style={styles.modalSubtitle}>
-    {translate('12-digit transaction reference number')}
-  </Text>
+    {/* Title */}
+    <Text style={styles.modalTitle}>{translate("Enter UTR Number")}</Text>
+    <Text style={styles.modalSubtitle}>
+      {translate("12-digit transaction reference number")}
+    </Text>
 
-  {/* Input */}
-  <View style={styles.inputWrapper}>
-    <TextInput
-      value={utr}
-      onChangeText={setUtr}
-      keyboardType="number-pad"
-      placeholder={translate('UTR Number')}
-      placeholderTextColor="#adb5bd"
-      style={styles.modalInput}
-      autoCorrect={false}
-      blurOnSubmit={false}
-      returnKeyType="done"
-      multiline={false}
-      maxLength={12}
-    />
-    {utr.length > 0 && (
-      <Text style={styles.charCount}>{utr.length}/12</Text>
-    )}
-  </View>
+    {/* Input */}
+    <View style={styles.inputWrapper}>
+      <TextInput
+        value={utr}
+        onChangeText={setUtr}
+        keyboardType="number-pad"
+        placeholder={translate("UTR Number")}
+        placeholderTextColor="#adb5bd"
+        style={styles.modalInput}
+        autoCorrect={false}
+        blurOnSubmit={false}
+        returnKeyType="done"
+        multiline={false}
+        maxLength={12}
+      />
+      {utr.length > 0 && (
+        <Text style={styles.charCount}>{utr.length}/12</Text>
+      )}
+    </View>
 
-  {/* Submit Button */}
-  <TouchableOpacity
-    style={[
-      styles.submitBtn,
-      { opacity: utr.length === 12 ? 1 : 0.5 },
-    ]}
-    onPress={handleSubmitUTR}
-    activeOpacity={0.8}
-  >
-    <Text style={styles.submitBtnText}>{translate('Submit Payment')}</Text>
-  </TouchableOpacity>
+    {/* Submit Button */}
+    <TouchableOpacity
+      style={[
+        styles.submitBtn,
+        {backgroundColor:colorConfig.primaryColor, opacity: utr.length === 12 ? 1 : 0.5 },
+      ]}
+      onPress={handleSubmitUTR}
+      activeOpacity={0.8}
+    >
+      <Text style={styles.submitBtnText}>{translate("Submit Payment")}</Text>
+    </TouchableOpacity>
+
+  </KeyboardAwareScrollView>
 </Modal>
       </View>
     </ScrollView>
@@ -316,8 +328,8 @@ const styles = StyleSheet.create({
 
     padding: 20,
     borderRadius: 10,
-    width: wScale(315),
-    height: wScale(205),
+    width: wScale(350),
+    height: wScale(500),
     alignSelf: 'center',
   },
   modalTitle: {
@@ -349,8 +361,8 @@ const styles = StyleSheet.create({
 
 closeBtn: {
   position: 'absolute',
-  top: hScale(-14),
-  right: wScale(-14),
+  top: hScale(-0),
+  right: wScale(0),
   zIndex: 10,
   backgroundColor: '#fff',
   borderRadius: wScale(20),
@@ -403,7 +415,6 @@ charCount: {
   color: '#94a3b8',
 },
 submitBtn: {
-  backgroundColor: '#667eea',
   borderRadius: wScale(12),
   paddingVertical: hScale(14),
   alignItems: 'center',

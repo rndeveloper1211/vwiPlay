@@ -4,6 +4,7 @@ import {
   Alert, Pressable, RefreshControl, ScrollView,
   StatusBar, TouchableOpacity, Animated,
   View, Text, StyleSheet, Image,
+  InteractionManager,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import IconButtons from './components/IconButtons';
@@ -137,16 +138,18 @@ const HomeScreen = () => {
 
   const scaleValue = useRef(new Animated.Value(1)).current;
 
-  useEffect(() => {
-    const zoomInOut = () => {
-      Animated.sequence([
-        Animated.timing(scaleValue, { toValue: 1,   duration: 1000, useNativeDriver: true }),
-        Animated.timing(scaleValue, { toValue: 0.8, duration: 1000, useNativeDriver: true }),
-      ]).start(() => zoomInOut());
-    };
-    zoomInOut();
-  }, [scaleValue]);
+useEffect(() => {
+  const animation = Animated.loop(
+    Animated.sequence([
+      Animated.timing(scaleValue, { toValue: 1,   duration: 1000, useNativeDriver: true }),
+      Animated.timing(scaleValue, { toValue: 0.8, duration: 1000, useNativeDriver: true }),
+    ])
+  );
 
+  animation.start();
+
+  return () => animation.stop(); // ✅ unmount pe band
+}, [scaleValue]);
   const Newssms = async () => {
     const res = await get({ url: APP_URLS.getProfile });
     if (res.data) {
@@ -227,24 +230,41 @@ const HomeScreen = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    setViewMoreStatus(false);
-    const getData = async () => {
-      await post({ url: `Retailer/api/data/Rem_CallAutofundtransfer?userid=${userId}` });
-      const userInfo = await get({ url: APP_URLS.getUserInfo });
-      const data     = userInfo.data;
-      setFirmDet(decryptData(data.vvvv, data.kkkk, data.frmanems));
-      setAdminFirmDet(decryptData(data.vvvv, data.kkkk, data.adminfarmname));
-      await AsyncStorage.setItem('adminFarmData', JSON.stringify({
-        adminFarmName: decryptData(data.vvvv, data.kkkk, data.adminfarmname),
-        frmanems:      decryptData(data.vvvv, data.kkkk, data.frmanems),
-        photoss:       decryptData(data.vvvv, data.kkkk, data.photoss),
-      }));
-    };
-    Promise.all([getData(), fetchData()]).then(() => setRefreshing(false));
-    adharpanStatus();
-  }, []);
+useEffect(() => {
+  setViewMoreStatus(false);
 
+  const task = InteractionManager.runAfterInteractions(() => {
+    const getData = async () => {
+      try {
+        await post({ url: `Retailer/api/data/Rem_CallAutofundtransfer?userid=${userId}` });
+        
+        const userInfo = await get({ url: APP_URLS.getUserInfo });
+        const { vvvv, kkkk, frmanems, adminfarmname, photoss } = userInfo.data;
+
+        const firmName      = decryptData(vvvv, kkkk, frmanems);
+        const adminFirmName = decryptData(vvvv, kkkk, adminfarmname);
+
+        setFirmDet(firmName);
+        setAdminFirmDet(adminFirmName);
+
+        await AsyncStorage.setItem('adminFarmData', JSON.stringify({
+          adminFarmName: adminFirmName,
+          frmanems:      firmName,
+          photoss:       decryptData(vvvv, kkkk, photoss),
+        }));
+
+      } catch (error) {
+        console.error('getData failed:', error);
+        // toast ya fallback yahan
+      }
+    };
+
+    Promise.all([getData(), fetchData(), adharpanStatus()])
+      .finally(() => setRefreshing(false));
+  });
+
+  return () => task.cancel();
+}, []);
   const adharpanStatus = async () => {
     try {
       const userInfo = await get({ url: APP_URLS.getUserInfo });
