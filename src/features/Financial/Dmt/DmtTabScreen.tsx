@@ -40,10 +40,10 @@ const SCENES: Record<RouteKey, React.ComponentType> = {
 // ─── API Config ───────────────────────────────────────────────────────────────
 
 const ROUTE_CONFIG = [
-  { api: () => ({ method: 'get', url: 'Retailer/api/data/DMTStatusCheck'  }), check: (r: any) => r?.Response === 'Success', route: { key: 'dmt1',   title: 'DMT 1'     } },
-  { api: () => ({ method: 'get', url: 'Retailer/api/data/DMTStatusCheck1' }), check: (r: any) => r?.Response === 'Success', route: { key: 'dmt2',   title: 'DMT 2'     } },
-  { api: () => ({ method: 'get', url: 'Retailer/api/data/PAYOUTStatusCheck'}), check: (r: any) => r?.Response === 'Success', route: { key: 'payout', title: 'Payout'    } },
-  { api: () => ({ method: 'post',url: 'MoneyDMT/api/PPI/info'              }), check: (r: any) => r?.RESULT  === true,      route: { key: 'ppi',    title: 'PPI Fast'  } },
+  { api: () => ({ method: 'get',  url: 'Retailer/api/data/DMTStatusCheck'   }), check: (r: any) => r?.Response === 'Success', route: { key: 'dmt1',   title: 'DMT 1'    } },
+  { api: () => ({ method: 'get',  url: 'Retailer/api/data/DMTStatusCheck1'  }), check: (r: any) => r?.Response === 'Success', route: { key: 'dmt2',   title: 'DMT 2'    } },
+  { api: () => ({ method: 'get',  url: 'Retailer/api/data/PAYOUTStatusCheck'}), check: (r: any) => r?.Response === 'Success', route: { key: 'payout', title: 'Payout'   } },
+  { api: () => ({ method: 'post', url: 'MoneyDMT/api/PPI/info'              }), check: (r: any) => r?.RESULT  === true,       route: { key: 'ppi',    title: 'PPI Fast' } },
 ] as const;
 
 const SCAN_ROUTE: Route = { key: 'scan', title: 'Scan & Pay' };
@@ -67,9 +67,12 @@ const SegmentedTabBar = React.memo(({
     }).start();
   }, [index]);
 
+  // Guard: single-tab edge-case needs at least 2 points for interpolation
+  const safeRoutes = routes.length > 1 ? routes : [...routes, routes[0]];
   const translateX = anim.interpolate({
-    inputRange: routes.map((_, i) => i),
-    outputRange: routes.map((_, i) => i * TAB_WIDTH + wScale(3)),
+    inputRange:  safeRoutes.map((_, i) => i),
+    outputRange: safeRoutes.map((_, i) => i * TAB_WIDTH + wScale(3)),
+    extrapolate: 'clamp',
   });
 
   return (
@@ -97,10 +100,7 @@ const SegmentedTabBar = React.memo(({
               android_ripple={{ color: 'transparent' }}
             >
               <Text
-                style={[
-                  styles.segLabel,
-                  { color: i === index ? primary : '#8E8E93' },
-                ]}
+                style={[styles.segLabel, { color: i === index ? primary : '#8E8E93' }]}
                 numberOfLines={1}
               >
                 {r.title}
@@ -156,51 +156,87 @@ const DmtTabScreen = () => {
   const [index, setIndex]         = useState(0);
   const { get, post }             = useAxiosHook();
 
+  // Stable refs — axios instance identity change se effect re-run nahi hoga
+  const getRef  = useRef(get);
+  const postRef = useRef(post);
+  useEffect(() => { getRef.current  = get;  }, [get]);
+  useEffect(() => { postRef.current = post; }, [post]);
+
   const primary = colorConfig?.primaryColor || '#007AFF';
 
   // ── Fetch active routes ──
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
       try {
         const calls = ROUTE_CONFIG.map(({ api }) => {
           const { method, url } = api();
-          return method === 'post' ? post({ url }) : get({ url });
+          return method === 'post'
+            ? postRef.current({ url })
+            : getRef.current({ url });
         });
-        const results = await Promise.all(calls);
+
+        // allSettled: ek API fail ho toh baaki tabs mat giraao
+        const settled = await Promise.allSettled(calls);
+
+        if (cancelled) return;
 
         const active: Route[] = ROUTE_CONFIG
-          .filter((cfg, i) => cfg.check(results[i]))
+          .filter((cfg, i) => {
+            const r = settled[i];
+            return r.status === 'fulfilled' && cfg.check(r.value);
+          })
           .map(cfg => cfg.route as Route);
 
         setRoutes([...active, SCAN_ROUTE]);
       } catch (e) {
-        console.error('[DmtTabScreen] fetch error:', e);
-        setRoutes([SCAN_ROUTE]); // fallback
+        if (!cancelled) {
+          console.error('[DmtTabScreen] fetch error:', e);
+          setRoutes([SCAN_ROUTE]);
+        }
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     })();
+
+    return () => { cancelled = true; }; // unmount pe setState nahi chalega
   }, []);
 
+  // Index clamp — routes shrink hone pe out-of-bounds se bachao
+  useEffect(() => {
+    if (routes.length > 0 && index >= routes.length) {
+      setIndex(routes.length - 1);
+    }
+  }, [routes]);
+
   const handleTabPress = useCallback((i: number) => setIndex(i), []);
-  const [aadharNumber, setAadharNumber] = useState('');
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [consumerName, setConsumerName] = useState('');
-  const [bankName, setBankName] = useState('');
+
+  const [aadharNumber,    setAadharNumber]    = useState('');
+  const [mobileNumber,    setMobileNumber]    = useState('');
+  const [consumerName,    setConsumerName]    = useState('');
+  const [bankName,        setBankName]        = useState('');
   const [fingerprintData, setFingerprintData] = useState('');
+
+  // Memoised context — har keystroke pe saare consumers re-render nahi honge
+  const ctxValue = useMemo(() => ({
+    aadharNumber,    setAadharNumber,
+    mobileNumber,    setMobileNumber,
+    consumerName,    setConsumerName,
+    bankName,        setBankName,
+    fingerprintData, setFingerprintData,
+    scanFingerprint: noop,
+    activeTabKey: routes[index]?.key,
+  }), [
+    aadharNumber, mobileNumber, consumerName,
+    bankName, fingerprintData, routes, index,
+  ]);
+
   // ── Render ──
   if (isLoading) return <ShowLoader />;
 
   return (
-    <DmtContext.Provider value={{
-      aadharNumber, setAadharNumber,
-      mobileNumber, setMobileNumber,
-      consumerName, setConsumerName,
-      bankName, setBankName,
-      fingerprintData, setFingerprintData,
-      scanFingerprint: noop,
-      activeTabKey: routes[index]?.key, // ✅
-    }}>
+    <DmtContext.Provider value={ctxValue}>
       <View style={styles.root}>
         <AppBarSecond title="Money Transfer" />
 

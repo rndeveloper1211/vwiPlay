@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  TextInput,
   View,
   StyleSheet,
   TouchableWithoutFeedback,
@@ -8,7 +7,6 @@ import {
   TouchableOpacity,
   ToastAndroid,
   Alert,
-  
 } from 'react-native';
 import { colors } from '../../utils/styles/theme';
 import { SCREEN_HEIGHT, hScale, wScale } from '../../utils/styles/dimensions';
@@ -35,36 +33,29 @@ import { useLocationHook } from '../../hooks/useLocationHook';
 
 const SubscriptionScreen = () => {
   const { get, post } = useAxiosHook();
-  const [textInput1, setTextInput1] = useState('');
+
+  // ── Redux & device hooks (declared early so callbacks can close over them) ──
+  const { userId, Loc_Data } = useSelector((state: RootState) => state.userInfo);
+  const { latitude, longitude } = useLocationHook();
+  const { getNetworkCarrier, getMobileIp } = useDeviceInfoHook();
+  const navigation = useNavigation<any>();
+
+  // ── UI state ──
   const [consumerNo, setconsumerNo] = useState(translate(''));
-  const [textInput3, setTextInput3] = useState('');
-  const [textInput4, setTextInput4] = useState('');
   const [insuranceOptList, setInsuranceOptList] = useState([]);
   const [isOperatorList, setIsOperatorList] = useState(false);
-  const [selectedOpt, setselectedOpt] = useState(
-    translate('Select Your Operator'),
-  );
-  const [CustomerID, setCustomerID] = useState('');
+  const [selectedOpt, setselectedOpt] = useState(translate('Select Your Operator'));
   const [amount, setAmount] = useState('');
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
-  const [ProceedSheetVisible, setProceedSheetVisible] = useState(false);
-  const [GasCylenderBillOPsheet, setGasCylenderBillOPsheet] = useState(false);
   const [maxlen, setMaxLen] = useState(10);
   const [isInfo, setIsinfo] = useState(false);
-  const [GasCylenderBillOpt, setGasCylenderBillOpt] = useState(
-    translate('Select Your Operator'),
-  );
-  const [district, setdistrict] = useState('');
-  const [DistList, setDistList] = useState([]);
 
+  // ── Operator / customer-param state ──
   const [accnumhint, setAccnumhint] = useState('');
   const [accmaxlength, setAccmaxlength] = useState(0);
   const [key2, setKey2] = useState('');
   const [keyType2, setKeyType2] = useState('');
   const [accntvisivility, setAccntvisivility] = useState(false);
-  const [firsttexthint, setFirsttexthint] = useState('');
-  const [key1, setKey1] = useState('');
-  const [keyType1, setKeyType1] = useState('default');
   const [accnumhint2, setAccnumhint2] = useState('');
   const [accmaxlength2, setAccmaxlength2] = useState(0);
   const [key3, setKey3] = useState('');
@@ -79,68 +70,71 @@ const SubscriptionScreen = () => {
   const [regx, setRegx] = useState('');
   const [visibility, setVisibility] = useState(false);
   const [optcode, setOptCode] = useState('');
+
+  // ── Bill-info state ──
   const [dueDate, setDueDate] = useState('N/A');
   const [CustomerName, setCustomerName] = useState('N/A');
   const [custBal, setCustBal] = useState(translate('Balance'));
   const [Status, setStatus] = useState(translate('Status'));
+
+  // ── Recent-transaction state ──
   const [reqTime, setReqTime] = useState('');
-  const [reqId, setReqId] = useState('')
+  const [reqId, setReqId] = useState('');
   const [isrecent, setIsrecent] = useState(false);
   const [historylist, setHistorylist] = useState([]);
-  const [agencyCode, setAgencyCode] = useState('')
+
+  // ── Agency-code inputs (extra customer params) ──
+  const [agencyCode, setAgencyCode] = useState('');
   const [agencyCode2, setAgencyCode2] = useState('');
+
   const [showLoader, setShowLoader] = useState(false);
 
-  useEffect(() => {
-    SubscriptionOpt('Subscription');
-  }, []);
-
-
-
-
-  const selectOperator = selectedOperator => {
-    console.log(latitude, longitude)
-    console.log('Selected Operator:', selectedOperator);
-    setselectedOpt(selectedOperator);
-    setIsOperatorList(false);
-  };
-  const navigation = useNavigation<any>();
-
-  useEffect(() => {
-    recenttransactions();
-console.log(latitude, longitude)
-  }, []);
-  const recenttransactions = async () => {
-    try {
-      const url = `${APP_URLS.recenttransaction}pageindex=1&pagesize=5&retailerid=${userId}&fromdate=${formattedDate}&todate=${formattedDate}&role=Retailer&rechargeNo=ALL&status=ALL&OperatorName=ALL&portno=ALL`
-      console.log(url);
-      const response = await get({ url: url })
-      console.log('-*************************************', response);
-
-      setHistorylist(response);
-      setReqTime(response[0]['Reqesttime']);
-      setReqId(response[0]['Request_ID'])
-
-    } catch (error) {
-      console.log(error);
-
-    }
-  }
-
+  // ── Date helper ──────────────────────────────────────────────────────────────
   const currentDate = new Date();
   const year = currentDate.getFullYear();
   const month = ('0' + (currentDate.getMonth() + 1)).slice(-2);
   const day = ('0' + currentDate.getDate()).slice(-2);
-
   const formattedDate = `${year}-${month}-${day}`;
-  const { getNetworkCarrier, getMobileDeviceId, getMobileIp } =
-    useDeviceInfoHook();
-  const { userId ,Loc_Data} = useSelector((state: RootState) => state.userInfo);
-  const { latitude, longitude } = useLocationHook();
 
+  // ── Effects ──────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    SubscriptionOpt('Subscription');
+  }, []);
+
+  useEffect(() => {
+    recenttransactions();
+  }, []);
+
+  // ── Recent transactions ──────────────────────────────────────────────────────
+  const recenttransactions = async () => {
+    try {
+      const url = `${APP_URLS.recenttransaction}pageindex=1&pagesize=5&retailerid=${userId}&fromdate=${formattedDate}&todate=${formattedDate}&role=Retailer&rechargeNo=ALL&status=ALL&OperatorName=ALL&portno=ALL`;
+      console.log(url);
+      const response = await get({ url });
+      console.log('-*************************************', response);
+
+      setHistorylist(response);
+
+      // FIX: guard against empty response before accessing index 0
+      if (response && response.length > 0) {
+        setReqTime(response[0]['Reqesttime']);
+        setReqId(response[0]['Request_ID']);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // ── Operator selection ───────────────────────────────────────────────────────
+  const selectOperator = selectedOperator => {
+    console.log(latitude, longitude);
+    console.log('Selected Operator:', selectedOperator);
+    setselectedOpt(selectedOperator);
+    setIsOperatorList(false);
+  };
+
+  // ── Recharge ─────────────────────────────────────────────────────────────────
   const onRechargePress = useCallback(async () => {
-
-    
     setShowLoader(true);
 
     const mobileNetwork = await getNetworkCarrier();
@@ -150,8 +144,8 @@ console.log(latitude, longitude)
       consumerNo,
       optcode,
       amount,
-      Loc_Data['latitude'],Loc_Data['longitude'],
-
+      Loc_Data['latitude'],
+      Loc_Data['longitude'],
       'city',
       'address',
       'postcode',
@@ -168,16 +162,13 @@ console.log(latitude, longitude)
     const ip1 = encodeURIComponent(encryption.encryptedData[10]);
     const em = '57bea5094fd9082d';
     const devtoken = encodeURIComponent(encryption.encryptedData[6]);
-
     const Latitude = encodeURIComponent(encryption.encryptedData[4]);
     const Longitude = encodeURIComponent(encryption.encryptedData[5]);
     const ModelNo = encodeURIComponent(encryption.encryptedData[11]);
     const City = devtoken;
-
     const PostalCode = encodeURIComponent(encryption.encryptedData[8]);
     const InternetTYPE = encodeURIComponent(encryption.encryptedData[9]);
     const Addresss = encodeURIComponent(encryption.encryptedData[7]);
-
     const value1 = encodeURIComponent(encryption.keyEncode);
     const value2 = encodeURIComponent(encryption.ivEncode);
 
@@ -185,68 +176,68 @@ console.log(latitude, longitude)
 
     let status, Message;
     try {
-      const res = await post({
-        url: url,
-      });
+      const res = await post({ url });
       console.log(res);
-      console.log(status);
-      if(res.status ==='False'){
+      if (res.status === 'False') {
         alert(res.message);
         setShowLoader(false);
-
-        return
+        return;
       }
       status = res.Response;
       Message = res.Message;
       await recenttransactions();
     } catch (error) {
-      console.error("Recharge failed:", error);
-      status = "Failed";
-      Message = "Recharge failed, please try again";
+      console.error('Recharge failed:', error);
+      status = 'Failed';
+      Message = 'Recharge failed, please try again';
     }
 
     setconsumerNo('');
     setselectedOpt('Select Your Operator');
     setAmount('');
-    setIsinfo(false)
+    setIsinfo(false);
     setShowLoader(false);
 
     navigation.navigate('Rechargedetails', {
-      mobileNumber: consumerNo ?? '',        
+      mobileNumber: consumerNo ?? '',
       Amount: amount ?? 0,
-      operator: selectedOpt ?? 'N/A',        // Default to 
-      status: status ?? 'Unknown',          // 
-      reqId: reqId ?? '',                   
-      reqTime: reqTime ?? new Date().toISOString(), 
-      Message: Message ?? 'No message available' // 
+      operator: selectedOpt ?? 'N/A',
+      status: status ?? 'Unknown',
+      reqId: reqId ?? '',
+      reqTime: reqTime ?? new Date().toISOString(),
+      Message: Message ?? 'No message available',
     });
-    
   }, [
     amount,
     getMobileIp,
     getNetworkCarrier,
-    latitude,
-    longitude,
+    Loc_Data,       // FIX: was latitude/longitude which are not used inside; Loc_Data is
     consumerNo,
     optcode,
     post,
     userId,
+    agencyCode,     // FIX: was missing
+    agencyCode2,    // FIX: was missing
+    selectedOpt,    // FIX: was missing
+    reqId,          // FIX: was missing
+    reqTime,        // FIX: was missing
   ]);
+
+  // ── Customer-param handler ───────────────────────────────────────────────────
   const handleItemPress = item => {
     setAccntvisivility(false);
     setAccntvisivility2(false);
-
     setDataType('');
     setMaxLen(0);
     setMinLength(0);
     setOptional('');
-    //  setParamName('Customer ID');
     setValues('');
     setRegx('');
     console.log(item['OPtCode']);
     setVisibility(false);
+
     if (!item.customerparams || item.customerparams.length === 0) {
-      //clearState();
+      // nothing extra to show
     } else {
       const custparam = item.customerparams;
 
@@ -263,11 +254,11 @@ console.log(latitude, longitude)
         setAccnumhint(custparam[1]['paramName']);
         setAccmaxlength(custparam[1]['maxLength']);
         setKey2(custparam[1]['dataType']);
-        setKeyType2(
-          custparam[1]['dataType'] === 'ALPHANUMERIC' ? 'default' : 'numeric',
-        );
-        setAccntvisivility(true);
-        setAccntvisivility2(false);
+        setKeyType2(custparam[1]['dataType'] === 'ALPHANUMERIC' ? 'default' : 'numeric');
+        // FIX: was accntvisivility=true / accntvisivility2=false (swapped)
+        // UI uses accntvisivility2 to show accnumhint field
+        setAccntvisivility2(true);
+        setAccntvisivility(false);
       } else if (custparam.length === 3) {
         setAccnumhint(custparam[1]['paramName']);
         setAccmaxlength(custparam[1]['maxLength']);
@@ -275,37 +266,31 @@ console.log(latitude, longitude)
         setAccmaxlength2(custparam[2]['maxLength']);
         setKey2(custparam[1]['dataType']);
         setKey3(custparam[2]['dataType']);
-        setKeyType2(
-          custparam[1]['dataType'] === 'ALPHANUMERIC' ? 'default' : 'numeric',
-        );
-        setKeyType3(
-          custparam[2]['dataType'] === 'ALPHANUMERIC' ? 'default' : 'numeric',
-        );
-        setAccntvisivility(true);
-
+        setKeyType2(custparam[1]['dataType'] === 'ALPHANUMERIC' ? 'default' : 'numeric');
+        setKeyType3(custparam[2]['dataType'] === 'ALPHANUMERIC' ? 'default' : 'numeric');
         setAccntvisivility2(true);
+        setAccntvisivility(true);
       } else {
         setAccntvisivility(false);
         setAccntvisivility2(false);
       }
     }
 
+    // FIX: call ViewbillInfoStatus with the fresh optcode from item (avoids stale closure)
+    ViewbillInfoStatus(item['OPtCode']);
     console.log(item);
   };
 
+  // ── Clear state ──────────────────────────────────────────────────────────────
   const clearState = () => {
     setDataType('');
     setMaxLength(0);
     setMinLength(0);
     setOptional('');
-    // setParamName(translate('Consumer Number'));
     setValues('');
     setRegx('');
     setVisibility(false);
     setOptCode('');
-    setFirsttexthint('');
-    setKey1('');
-    setKeyType1('default');
     setAccnumhint('');
     setAccmaxlength(0);
     setKey2('');
@@ -316,13 +301,11 @@ console.log(latitude, longitude)
     setKeyType3('default');
   };
 
+  // ── API calls ────────────────────────────────────────────────────────────────
   async function SubscriptionOpt(opttype) {
     try {
       const url = `${APP_URLS.getDthOperator}${opttype}`;
-      const res = await get({
-        url: url,
-      });
-
+      const res = await get({ url });
       console.log(url);
       setInsuranceOptList(res['myprop2Items']);
     } catch (error) {
@@ -330,6 +313,45 @@ console.log(latitude, longitude)
     }
   }
 
+  async function billInfo() {
+    try {
+      const url = `${APP_URLS.rechargeViewBill}billnumber=${consumerNo}&Operator=${optcode}&billunit&ProcessingCycle&acno&lt&ViewBill=Y`;
+      const res = await get({ url });
+      // FIX: data object now uses consumerNo consistently (was CustomerID which is always empty)
+      console.log('Operator:', optcode);
+      if (res['RESULT'] === '0') {
+        const addinfo = res['ADDINFO'];
+        const billinfoo = addinfo['BillInfo'];
+        setDueDate(billinfoo['billDueDate']);
+        setAmount(billinfoo['billAmount']);
+        setCustomerName(billinfoo['customerName']);
+        setCustBal(billinfoo['balance']);
+      } else {
+        Alert.alert(res['ADDINFO'], res['Message'], [{ text: 'OK', onPress: () => {} }]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  // FIX: accepts currentOptCode param to avoid stale optcode closure
+  async function ViewbillInfoStatus(currentOptCode?: string) {
+    const codeToUse = currentOptCode ?? optcode;
+    console.log('ViewbillInfoStatus optcode:', codeToUse);
+    try {
+      const url = `${APP_URLS.viewbillstatuscheck}${codeToUse}`;
+      const res = await post({ url });
+      console.log('ViewbillInfoStatus response:', res);
+      const billSts = res['RESULT'];
+      if (billSts === 'Y') {
+        setIsinfo(true);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  // ── Bottom-sheet operator list ───────────────────────────────────────────────
   const showBottomSheetList = () => {
     return (
       <View style={{ marginVertical: wScale(8), marginHorizontal: wScale(24) }}>
@@ -345,12 +367,14 @@ console.log(latitude, longitude)
                 }}>
                 <TouchableWithoutFeedback
                   onPress={async () => {
+                    const newOptCode = item['OPtCode'];
                     handleItemPress(item);
-                    setOptCode(item['OPtCode']);
+                    setOptCode(newOptCode);
                     setselectedOpt(item['Operatorname']);
                     setIsOperatorList(false);
-                    ViewbillInfoStatus();
-                    console.log(item['OPtCode']);
+                    // FIX: pass fresh optcode instead of relying on stale state
+                    ViewbillInfoStatus(newOptCode);
+                    console.log(newOptCode);
                   }}>
                   <Text style={{ color: '#ff4670', fontSize: 18 }}>
                     {item['Operatorname']}
@@ -364,64 +388,14 @@ console.log(latitude, longitude)
       </View>
     );
   };
-  async function billInfo() {
-    try {
-      const config = {
-        headers: {
-          Authorization: `Bearer`,
-        },
-      };
-      const data = {
-        billnumber: CustomerID,
-        Operator: optcode,
-        billunit: '',
-        ProcessingCycle: '',
-        acno: 'acno',
-        lt: '',
-        ViewBill: 'Y',
-      };
-      const url = `${APP_URLS.rechargeViewBill}billnumber=${consumerNo}&Operator=${optcode}&billunit&ProcessingCycle&acno&lt&ViewBill=Y`;
-      const res = await get({ url: url });
-      console.log(data.Operator);
-      if (res['RESULT'] === '0') {
-        const addinfo = res['ADDINFO']
-        const billinfoo = addinfo['BillInfo'];
-        setDueDate(billinfoo["billDueDate"]);
-        setAmount(billinfoo["billAmount"]);
-        setCustomerName(billinfoo["customerName"]);
-        setCustBal(billinfoo["balance"]);
-        setAmount(billinfoo["billAmount"]);
-        //setstatus(res["customerStatus"])
-      } else {
-        Alert.alert(res['ADDINFO'], res['Message'], [{ text: 'OK', onPress: () => { } }]);
-      }
-    } catch (error) { }
-  }
-  async function ViewbillInfoStatus() {
-    console.log(optcode);
-    try {
 
-      const data = {
-        Operatorcode: optcode,
-      };
-      const url = `${APP_URLS.viewbillstatuscheck}${optcode}`;
-      const res = await post({ url: url, });
-
-      console.log(':', url);
-      const billSts = res['RESULT'];
-      if (billSts === 'Y') {
-        setIsinfo(true);
-      } else {
-        // setIsinfo(false);
-      }
-      console.log(':', res);
-    } catch (error) { }
-  }
-
+  // ── Validation ───────────────────────────────────────────────────────────────
   const validateFields = () => {
-    if (paramname == 'Consumer Number') {
+    // FIX: was `paramname == 'Consumer Number'` which never actually validates the input
+    // FIX: removed stray trailing apostrophe from toast message
+    if (!consumerNo || !consumerNo.trim()) {
       ToastAndroid.showWithGravity(
-        `Please Enter ${paramname}'`,
+        `Please Enter ${paramname}`,
         ToastAndroid.SHORT,
         ToastAndroid.BOTTOM,
       );
@@ -439,9 +413,10 @@ console.log(latitude, longitude)
       );
     } else {
       setBottomSheetVisible(true);
-
     }
   };
+
+  // ── Render ───────────────────────────────────────────────────────────────────
   return (
     <View style={styles.main}>
       <AppBarSecond title={'Subscription Screen'} />
@@ -454,49 +429,42 @@ console.log(latitude, longitude)
         <TouchableOpacity onPress={() => setIsOperatorList(true)}>
           <FlotingInput label={selectedOpt} editable={false} />
           <View style={[styles.righticon2]}>
-
             <OnelineDropdownSvg />
           </View>
-
-
         </TouchableOpacity>
+
         {accntvisivility2 && (
           <View>
             <FlotingInput label={accnumhint} onChangeTextCallback={(text) => setAgencyCode(text)}
-              value={agencyCode} 
+              value={agencyCode}
             />
             <TouchableOpacity>
               <Text style={{}}></Text>
             </TouchableOpacity>
           </View>
         )}
+
         {accntvisivility && (
-          <View >
-
+          <View>
             <FlotingInput label={accnumhint2} onChangeTextCallback={(text) => setAgencyCode2(text)}
-              value={agencyCode2} 
-
+              value={agencyCode2}
             />
             <View style={[styles.righticon2]}>
               <TouchableOpacity>
-
                 <Text style={[styles.infobtntex,]}>{translate("Info")}</Text>
               </TouchableOpacity>
-
             </View>
-
           </View>
         )}
 
         <View>
-          <FlotingInput label={paramname} value={consumerNo} 
-            
+          <FlotingInput label={paramname} value={consumerNo}
             onChangeTextCallback={text => {
-              setconsumerNo(text); 
+              setconsumerNo(text);
               if (text.length >= 5) {
-                setIsinfo(true)
+                setIsinfo(true);
               } else {
-                setIsinfo(false)
+                setIsinfo(false);
               }
             }}
           />
@@ -504,64 +472,49 @@ console.log(latitude, longitude)
             {isInfo && (
               <TouchableOpacity
                 style={styles.infobtn}
-                // onPress={() => {
-                //   handleInfoPress()
-
-                //   setShowLoader2(true)
-
-                // }}
                 onPress={() => {
                   billInfo();
                   setBottomSheetVisible(true);
-                }}              >
-
+                }}>
                 <Text style={[styles.infobtntex,]}>{translate("Info")}</Text>
-
               </TouchableOpacity>
             )}
           </View>
         </View>
 
         <FlotingInput label={'Enter Amount'}
-             maxLength={5}
-              value={amount} onChangeTextCallback={text => setAmount(text)}
+          maxLength={5}
+          value={amount} onChangeTextCallback={text => setAmount(text)}
           keyboardType="number-pad" />
-
-
 
         <DynamicButton title={'Next'} onPress={() => {
           validateFields();
         }} />
 
-        <View >
-
+        <View>
           <RecentHistory
             isModalVisible={isrecent}
             setModalVisible={setIsrecent}
             historylistdata={historylist}
             onBackdropPress={() => setIsrecent(false)}
-
           />
           <TouchableOpacity onPress={() => {
             setIsrecent(true);
           }}
             style={styles.recentviewbtn}>
-           <RecentText/>
+            <RecentText />
           </TouchableOpacity>
         </View>
-
 
         <OperatorBottomSheet
           isModalVisible={isOperatorList}
           operatorData={insuranceOptList}
-          //// stateData={stateList}
-          selectedOperator={() => { selectedOpt; setIsOperatorList(false) }}
+          selectedOperator={() => { selectedOpt; setIsOperatorList(false); }}
           setModalVisible={setIsOperatorList}
           selectOperator={selectOperator}
           setOperatorcode={setOptCode}
           showState={false}
           handleItemPress={handleItemPress}
-
         />
 
         <Rechargeconfirm
@@ -570,13 +523,11 @@ console.log(latitude, longitude)
           onBackdropPress={() => setBottomSheetVisible(false)}
           status={Status}
           details={[
-                { label: 'User Name', value2: CustomerName === '' ? 'N/A' : CustomerName },
+            { label: 'User Name', value2: CustomerName === '' ? 'N/A' : CustomerName },
             { label: 'Customer ID', value: consumerNo },
             { label: 'Due Date', value2: dueDate === '' ? 'N/A' : dueDate },
             { label: 'Operator Name', value2: selectedOpt },
             { label: 'Customer Status', value2: Status === '' ? 'N/A' : Status },
-
-
           ]}
           lastlabel={'Transaction Amount'}
           lastvalue={amount}
@@ -590,82 +541,33 @@ console.log(latitude, longitude)
             } else {
               onRechargePress();
               setBottomSheetVisible(false);
-              setProceedSheetVisible(true);
             }
-          }
-          }
+          }}
         />
-        <BottomSheet animationType="none"  
-          // isVisible={isOperatorList}
-          onBackdropPress={() => {
-            setIsOperatorList(false);
-          }}>
-          <View
-            style={{
-              height: SCREEN_HEIGHT / 1.5,
-              flex: 1,
-              marginBottom: wScale(40),
-            }}></View>
-          {showBottomSheetList()}
-        </BottomSheet>
 
-        <BottomSheet animationType="none"  
-          // isVisible={bottomSheetVisible}
-          onBackdropPress={() => setBottomSheetVisible(false)}>
-          <View style={{ bottom: hScale(10) }}>
-            <Card>
-              <Text> Operator: {selectedOpt}</Text>
-            </Card>
-            <Card>
-              <Text>Due Date: {dueDate}</Text>
-            </Card>
-            <Card>
-              <Text>
-                {translate('Customer Name')} {CustomerName}
-              </Text>
-            </Card>
-            <Card>
-              <Text>
-                {translate('Consumer Number')} {consumerNo}
-              </Text>
-            </Card>
-            <Card>
-              <Text>Recharge Amount: {amount}</Text>
-            </Card>
-            <TouchableOpacity
-              onPress={() => {
-                onRechargePress();
-                setBottomSheetVisible(false);
-                setProceedSheetVisible(true);
-              }}>
-              <Text style={styles.DetailButton}>{translate('ConfirmPay')}</Text>
-            </TouchableOpacity>
-          </View>
-        </BottomSheet>
       </View>
     </View>
-
   );
 };
 
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
   container: {
     paddingHorizontal: wScale(20),
     paddingTop: wScale(30),
-    flex: 1
+    flex: 1,
   },
   righticon2: {
-    position: "absolute",
-    left: "auto",
+    position: 'absolute',
+    left: 'auto',
     right: wScale(0),
     top: hScale(0),
-    height: "85%",
-    alignItems: "flex-end",
-    justifyContent: "center",
+    height: '85%',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
     paddingRight: wScale(12),
   },
   infobtn: {
@@ -678,19 +580,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'green',
     paddingHorizontal: wScale(13),
     paddingVertical: hScale(5),
-    borderRadius: 5
+    borderRadius: 5,
   },
   recentviewbtn: {
     alignSelf: 'flex-end',
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   recent: {
     color: '#000',
     textAlign: 'right',
     paddingVertical: hScale(10),
   },
-
-
   DetailButton: {
     alignContent: 'center',
     justifyContent: 'center',

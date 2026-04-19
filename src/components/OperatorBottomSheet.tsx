@@ -7,34 +7,35 @@ import {
   StyleSheet,
   TextInput,
   Keyboard,
-  Platform,
 } from "react-native";
 import { BottomSheet } from "@rneui/themed";
 import { FlashList } from "@shopify/flash-list";
 import { useSelector } from "react-redux";
-import { useSafeAreaInsets } from "react-native-safe-area-context"; // ✅ ADD
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { RootState } from "../reduxUtils/store";
 import { SCREEN_HEIGHT, hScale, wScale } from "../utils/styles/dimensions";
 import ClosseModalSvg2 from "../features/drawer/svgimgcomponents/ClosseModal2";
-import { colors } from "../utils/styles/theme";
 
 interface Props {
-  operatorData: any[];
-  stateData: any[];
-  isModalVisible: boolean;
-  selectedOperator: string;
-  setModalVisible: (v: boolean) => void;
-  selectOperator: (name: string) => void;
-  setOperatorcode: (code: string) => void;
-  setCircle: (circle: string) => void;
-  setState: (state: string) => void;
+  operatorData?: any[];
+  stateData?: any[];
+  isModalVisible?: boolean;
+  selectedOperator?: string;
+  setModalVisible?: (v: boolean) => void;
+  selectOperator?: (name: string) => void;
+  setOperatorcode?: (code: string) => void;
+  setCircle?: (circle: string) => void;
+  setState?: (state: string) => void;
   showState?: boolean;
   setOperator?: (name: string) => void;
-  selectOperatorImage: (path: string) => void;
-  path: string;
+  selectOperatorImage?: (path: string) => void;
+  path?: string;
   handleItemPress?: (item: any) => void;
 }
 
+// ─────────────────────────────────────────────────
+// OperatorItem
+// ─────────────────────────────────────────────────
 const OperatorItem = React.memo(({
   item,
   isOperator,
@@ -56,7 +57,7 @@ const OperatorItem = React.memo(({
         <Image source={{ uri: item["path"] }} style={styles.itemImg} />
       ) : (
         <Text style={[styles.iconFallback, { color: primaryColor }]}>
-          {(isOperator ? item["Operatorname"] : item["Sate Name"])
+          {(isOperator ? item["Operatorname"] : item["State Name"])
             ?.charAt(0)
             ?.toUpperCase()}
         </Text>
@@ -69,6 +70,9 @@ const OperatorItem = React.memo(({
   </TouchableOpacity>
 ));
 
+// ─────────────────────────────────────────────────
+// SheetHeader
+// ─────────────────────────────────────────────────
 const SheetHeader = ({
   isOperator,
   selectedOperator,
@@ -116,6 +120,9 @@ const SheetHeader = ({
   </View>
 );
 
+// ─────────────────────────────────────────────────
+// SearchBar
+// ─────────────────────────────────────────────────
 const SearchBar = ({
   value,
   onChangeText,
@@ -135,7 +142,9 @@ const SearchBar = ({
         { borderColor: focused ? primaryColor : '#E0E0E0' },
       ]}
     >
-      <Text style={[styles.searchIcon, { color: focused ? primaryColor : '#aaa' }]}>⌕</Text>
+      <Text style={[styles.searchIcon, { color: focused ? primaryColor : '#aaa' }]}>
+        ⌕
+      </Text>
       <TextInput
         value={value}
         onChangeText={onChangeText}
@@ -164,30 +173,28 @@ const SearchBar = ({
 // Main Component
 // ─────────────────────────────────────────────────
 const OperatorBottomSheet: React.FC<Props> = ({
-  //operatorData,
-  stateData,
-  isModalVisible,
-  selectedOperator,
-  ///setModalVisible,
-  selectOperator,
-  setOperatorcode,
-  setCircle,
-  setState,
+  operatorData = [],
+  stateData = [],
+  isModalVisible = false,
+  selectedOperator = '',
+  setModalVisible = () => {},
+  selectOperator = () => {},
+  setOperatorcode = () => {},
+  setCircle = () => {},
+  setState = () => {},
   showState = false,
-  operatorData       = [],
-setModalVisible    = () => {},
-selectOperatorImage = () => {}  , // ← yahi crash fix karta hai
-path               = '',
+  setOperator = () => {},        // ✅ FIX: properly destructured with no-op default
+  selectOperatorImage = () => {},
+  path = '',
   handleItemPress,
 }) => {
-  const insets = useSafeAreaInsets(); // ✅ ADD
+  const insets = useSafeAreaInsets();
   const { colorConfig } = useSelector((state: RootState) => state.userInfo);
   const primaryColor = colorConfig.primaryColor;
   const bgColor = `${primaryColor}18`;
 
   const [selectbool, setSelectbool] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const searchRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (!isModalVisible) {
@@ -213,14 +220,14 @@ path               = '',
       return;
     }
     if (selectbool) {
-      setOperator?.(item["Operatorname"]);
+      setOperator(item["Operatorname"]);   // ✅ safe — no more ReferenceError
       setOperatorcode(item["OPtCode"]);
       selectOperatorImage(item["path"]);
       handleItemPress?.(item);
       setSelectbool(false);
     } else {
       setCircle(item["State Name"]);
-      setState(item["Sate Name"]);
+      setState(item["State Name"]);
       setModalVisible(false);
     }
   };
@@ -235,7 +242,6 @@ path               = '',
         setModalVisible(false);
       }}
     >
-      {/* ✅ paddingBottom: insets.bottom add kiya sheet mein */}
       <View style={[styles.sheet, { paddingBottom: insets.bottom }]}>
 
         <SheetHeader
@@ -276,11 +282,11 @@ path               = '',
             keyboardShouldPersistTaps="always"
             estimatedItemSize={64}
             keyExtractor={(item, i) =>
-              selectbool ? item["OPtCode"] ?? String(i) : item["State Name"] ?? String(i)
+              selectbool
+                ? item["OPtCode"] ?? String(i)
+                : item["State Name"] ?? String(i)
             }
-            contentContainerStyle={{
-              paddingBottom: hScale(30), // ✅ insets.bottom sheet level par handle ho raha hai
-            }}
+            contentContainerStyle={{ paddingBottom: hScale(30) }}
             renderItem={({ item }) => (
               <OperatorItem
                 item={item}
@@ -296,6 +302,9 @@ path               = '',
   );
 };
 
+// ─────────────────────────────────────────────────
+// Styles
+// ─────────────────────────────────────────────────
 const styles = StyleSheet.create({
   sheet: {
     backgroundColor: "#fff",
@@ -304,7 +313,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: wScale(20),
     overflow: "hidden",
   },
-
   header: {
     borderTopLeftRadius: wScale(20),
     borderTopRightRadius: wScale(20),
@@ -354,7 +362,6 @@ const styles = StyleSheet.create({
     padding: wScale(8),
     borderRadius: wScale(20),
   },
-
   searchWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -381,7 +388,6 @@ const styles = StyleSheet.create({
     color: "#aaa",
     paddingLeft: wScale(8),
   },
-
   stepRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -404,7 +410,6 @@ const styles = StyleSheet.create({
     fontSize: wScale(12),
     marginLeft: wScale(6),
   },
-
   itemRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -443,7 +448,6 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     marginLeft: wScale(8),
   },
-
   emptyBox: {
     flex: 1,
     alignItems: "center",

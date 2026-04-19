@@ -177,12 +177,15 @@ const DrawerNavigation = ({ navigation }) => {
                       {adminData && adminData.Photo ? (
                         <FastImage
                           source={{
+                            priority: FastImage.priority.high,
                             uri: `http://${APP_URLS.baseWebUrl}${adminData.Photo}`,
                           }}
                           style={styles.userimg} />
                       ) : (
                         <FastImage
-                          source={{uri:`${IMAGE_BASE_URL}bussiness-man.png`}}
+                          source={{
+                              priority: FastImage.priority.high,
+                            uri:`${IMAGE_BASE_URL}bussiness-man.png`}}
                           style={styles.userimg} />
                       )}
                     </View>

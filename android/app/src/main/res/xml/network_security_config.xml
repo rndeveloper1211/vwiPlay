@@ -8,7 +8,9 @@
  <domain includeSubdomains="true">github.com</domain>
     <domain includeSubdomains="true">objects.githubusercontent.com</domain>
     <domain includeSubdomains="true">codeload.github.com</domain>
-    <domain includeSubdomains="true">native.sonicswipe.in</domain>
+    <domain includeSubdomains="true">native.stdigipe.in</domain>
+        <domain includeSubdomains="true">cdn.jsdelivr.net</domain>  <!-- ✅ image CDN -->
+
     <trust-anchors>
       <certificates src="system"/>
       <certificates src="user"/>

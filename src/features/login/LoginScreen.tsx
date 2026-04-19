@@ -73,8 +73,8 @@ import SmartIcon from '../../components/svgToPngUrl';
 const LoginScreen = () => {
   const { colorConfig, Loc_Data, deviceInfo, signUpId,signUpPassword} = useSelector((state: RootState) => state.userInfo);
   const [modalVisible, setModalVisible] = useState(false)
-  const [userEmail, setUserEmail] = useState(signUpId || '');
-  const [userPassword, setUserPassword] = useState( signUpPassword || '');
+  const [userEmail, setUserEmail] = useState(signUpId || '9370521211');
+  const [userPassword, setUserPassword] = useState( signUpPassword || '521211');
   const [mobileNumber, setMobileNumber] = useState('7414088555');
   const [uniqueId, setUniqueId] = useState('');
   const [modelNumber, setModelNumber] = useState('');

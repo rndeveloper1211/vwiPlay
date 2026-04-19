@@ -565,17 +565,17 @@ const navigateToEditProfile = useCallback(async () => {
       {/* Avatar */}
       <View style={styles.avatarWrap}>
         <View style={[styles.avatarRing, { borderColor: "rgba(255,255,255,0.7)" }]}>
-          <FastImage
-            resizeMode="cover"
-            source={
-              profileImage
-                ? { uri: "data:image/png;base64," + profileImage }
-                : profileData?.Photo
-                  ? { uri: `http://${APP_URLS.baseWebUrl}${profileData.Photo}` }
-                  : {uri:`${IMAGE_BASE_URL}bussiness-man.png`}
-            }
-            style={styles.avatarImg}
-          />
+        <FastImage
+  resizeMode="cover"
+  source={
+    profileImage
+      ? { uri: "data:image/png;base64," + profileImage }
+      : profileData?.Photo
+        ? { uri: `http://${APP_URLS.baseWebUrl}${profileData.Photo.replace(/\\/g, '/')}` }
+        : { uri: `${IMAGE_BASE_URL}bussiness-man.png` }
+  }
+  style={styles.avatarImg}
+/>
         </View>
         <TouchableOpacity
           onPress={navigateToEditProfile}

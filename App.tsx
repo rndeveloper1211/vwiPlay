@@ -104,7 +104,7 @@ const startUpdate = async (data: any) => {
   }
 };
   useEffect(() => {
-checkOta();
+//checkOta();
     // Language badalte hi agar lock/unlock state reset karni hai toh
     dispatch(setUnlocked(false));
   }, [dispatch, language]);
